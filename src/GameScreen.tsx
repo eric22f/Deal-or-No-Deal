@@ -5,13 +5,13 @@ interface GameScreenProps {
   onReset: () => void
 }
 
-const PESO_VALUES = [
-  0.01, 1, 5, 10, 25, 50, 75, 100, 200, 300, 400, 500, 750,
-  1000, 5000, 10000, 25000, 50000, 75000, 100000, 200000,
-  300000, 400000, 500000, 1000000, 4000000
-]
+const LEFT_COLUMN_VALUES = [0.05, 1, 5, 10, 20, 50, 100, 150, 200, 250, 300, 350]
+const RIGHT_COLUMN_VALUES = [400, 450, 500, 600, 700, 800, 900, 1000, 1200, 1400, 2000, 5000]
 
 function GameScreen({ playerName, onReset }: GameScreenProps) {
+  const leftColumn = LEFT_COLUMN_VALUES
+  const rightColumn = RIGHT_COLUMN_VALUES
+
   return (
     <div className="game-screen">
       <div className="left-panel">
@@ -31,12 +31,22 @@ function GameScreen({ playerName, onReset }: GameScreenProps) {
         <div className="scoreboard">
           <div className="scoreboard-title">Prize Board</div>
           <div className="scoreboard-values">
-            {PESO_VALUES.map((value, index) => (
-              <div key={index} className="scoreboard-item">
-                <span className="peso-symbol">₱</span>
-                <span className="amount-value">{value.toLocaleString('en-PH')}</span>
-              </div>
-            ))}
+            <div className="scoreboard-column">
+              {leftColumn.map((value, index) => (
+                <div key={`left-${index}`} className="scoreboard-item">
+                  <span className="peso-symbol">₱</span>
+                  <span className="amount-value">{value.toLocaleString('en-PH')}</span>
+                </div>
+              ))}
+            </div>
+            <div className="scoreboard-column">
+              {rightColumn.map((value, index) => (
+                <div key={`right-${index}`} className="scoreboard-item">
+                  <span className="peso-symbol">₱</span>
+                  <span className="amount-value">{value.toLocaleString('en-PH')}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

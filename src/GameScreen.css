@@ -66,10 +66,16 @@
 .scoreboard-values {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px;
+  gap: 8px;
   overflow-y: auto;
   padding-right: 10px;
   flex: 1;
+}
+
+.scoreboard-column {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .scoreboard-item {

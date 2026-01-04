@@ -10,7 +10,6 @@ interface PlayerScore {
 function App() {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playerName, setPlayerName] = useState('')
-  const [isMuted, setIsMuted] = useState(false)
   const [playerScores, setPlayerScores] = useState<PlayerScore[]>([])
   const [nameError, setNameError] = useState('')
   const [isGameActive, setIsGameActive] = useState(false)
@@ -73,15 +72,8 @@ function App() {
     setCurrentPlayer('')
     setPlayerName('')
     
-    if (audioRef.current && !isMuted) {
-      audioRef.current.play()
-    }
-  }
-
-  const toggleMute = () => {
     if (audioRef.current) {
-      audioRef.current.muted = !isMuted
-      setIsMuted(!isMuted)
+      audioRef.current.play()
     }
   }
 
@@ -91,9 +83,6 @@ function App() {
 
   return (
     <div className="intro-screen">
-      <button className="mute-button" onClick={toggleMute}>
-        {isMuted ? '🔇' : '🔊'}
-      </button>
       <img 
         src="/deal-no-deal-intro.gif" 
         alt="Deal or No Deal" 
