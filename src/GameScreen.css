@@ -1,7 +1,8 @@
 .game-screen {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
   background-color: #000;
+  overflow: hidden;
 }
 
 .left-panel {
@@ -131,9 +132,11 @@
   flex: 1;
   background-color: #000;
   position: relative;
-  padding: 20px;
+  padding: 15px 15px 0 15px;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  max-height: 100vh;
 }
 
 .game-message {
@@ -161,8 +164,9 @@
   grid-template-columns: repeat(12, 1fr);
   gap: 15px;
   padding: 0;
-  flex: 1;
   align-content: start;
+  overflow: hidden;
+  max-height: calc(100vh - 100px);
 }
 
 .briefcase {
@@ -174,7 +178,7 @@
   justify-content: center;
   transition: transform 0.2s;
   width: 100%;
-  max-width: 150px;
+  max-width: 120px;
   justify-self: center;
   grid-column: span 2;
 }
