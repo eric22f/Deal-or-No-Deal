@@ -3,6 +3,9 @@ import './GameScreen.css'
 
 interface GameScreenProps {
   playerName: string
+  onReset: () => void
+  onGameEnd: (winnings: number) => void
+  playerScores: { name: string; winnings: number }[]
 }
 
 const LEFT_COLUMN_VALUES = [0.05, 1, 5, 10, 20, 50, 100, 125, 150, 200, 250]
@@ -20,12 +23,14 @@ interface Briefcase {
 
 const CASES_TO_OPEN_PER_ROUND = [6, 5, 4, 3, 2, 1]
 
-function GameScreen({ playerName }: GameScreenProps) {
+function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreenProps) {
   const [briefcases, setBriefcases] = useState<Briefcase[]>([])
   const [gamePhase, setGamePhase] = useState<GamePhase>('SELECT_YOUR_CASE')
   const [currentRound, setCurrentRound] = useState(0)
   const [casesOpenedThisRound, setCasesOpenedThisRound] = useState(0)
   const [openedAmounts, setOpenedAmounts] = useState<number[]>([])
+  const [casesToRemove, setCasesToRemove] = useState<number[]>([])
+  const [finalWinnings, setFinalWinnings] = useState<number>(0)
 
   useEffect(() => {
     initializeGame()
@@ -83,10 +88,22 @@ function GameScreen({ playerName }: GameScreenProps) {
 
   const handleDealOrNoDeal = (isDeal: boolean) => {
     if (isDeal) {
+      const bankerOffer = 2500
+      setFinalWinnings(bankerOffer)
+      onGameEnd(bankerOffer)
       setGamePhase('GAME_OVER')
     } else {
+      const openedCaseIds = briefcases
+        .filter(b => b.isOpened && !b.isPlayerCase)
+        .map(b => b.id)
+      setCasesToRemove([...casesToRemove, ...openedCaseIds])
+      
       const nextRound = currentRound + 1
       if (nextRound >= CASES_TO_OPEN_PER_ROUND.length) {
+        const playerCase = briefcases.find(b => b.isPlayerCase)
+        const winnings = playerCase?.amount || 0
+        setFinalWinnings(winnings)
+        onGameEnd(winnings)
         setGamePhase('GAME_OVER')
       } else {
         setCurrentRound(nextRound)
@@ -104,8 +121,10 @@ function GameScreen({ playerName }: GameScreenProps) {
       return `Open ${remaining} more case${remaining !== 1 ? 's' : ''}`
     } else if (gamePhase === 'BANKER_OFFER') {
       return 'The banker is calling...'
+    } else if (gamePhase === 'GAME_OVER') {
+      return `You Win ₱ ${finalWinnings.toLocaleString('en-PH')}`
     }
-    return 'Game Over'
+    return ''
   }
 
   const leftColumn = LEFT_COLUMN_VALUES
@@ -135,7 +154,7 @@ function GameScreen({ playerName }: GameScreenProps) {
                   key={`left-${index}`} 
                   className={`scoreboard-item ${openedAmounts.includes(value) ? 'disabled' : ''}`}
                 >
-                  <span className="peso-symbol">₱</span>
+                  <span className="peso-symbol">₱ </span>
                   <span className="amount-value">{value.toLocaleString('en-PH')}</span>
                 </div>
               ))}
@@ -146,7 +165,7 @@ function GameScreen({ playerName }: GameScreenProps) {
                   key={`right-${index}`} 
                   className={`scoreboard-item ${openedAmounts.includes(value) ? 'disabled' : ''}`}
                 >
-                  <span className="peso-symbol">₱</span>
+                  <span className="peso-symbol">₱ </span>
                   <span className="amount-value">{value.toLocaleString('en-PH')}</span>
                 </div>
               ))}
@@ -173,7 +192,44 @@ function GameScreen({ playerName }: GameScreenProps) {
           {getMessage()}
         </div>
 
-        {gamePhase === 'BANKER_OFFER' ? (
+        {gamePhase === 'GAME_OVER' ? (
+          <div className="game-over-container">
+            <div className="player-final-case">
+              <div className="opened-briefcase">
+                <img 
+                  src="/briefcases/briefcase-open.png"
+                  alt="Your Final Case"
+                  className="briefcase-open-image"
+                />
+                <div className="briefcase-amount">
+                  ₱ {finalWinnings.toLocaleString('en-PH')}
+                </div>
+              </div>
+            </div>
+
+            <div className="leaderboard">
+              <div className="leaderboard-title">Leaderboard</div>
+              <div className="leaderboard-list">
+                {playerScores
+                  .sort((a, b) => b.winnings - a.winnings)
+                  .map((player, index) => (
+                    <div 
+                      key={index}
+                      className={`leaderboard-item ${player.name === playerName ? 'current-player' : ''}`}
+                    >
+                      <span className="leaderboard-rank">{index + 1}.</span>
+                      <span className="leaderboard-name">{player.name}</span>
+                      <span className="leaderboard-winnings">₱ {player.winnings.toLocaleString('en-PH')}</span>
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            <button className="next-button" onClick={onReset}>
+              Next
+            </button>
+          </div>
+        ) : gamePhase === 'BANKER_OFFER' ? (
           <div className="banker-offer-container">
             <div className="banker-offer">
               <div className="offer-title">Banker's Offer</div>
@@ -190,23 +246,40 @@ function GameScreen({ playerName }: GameScreenProps) {
           </div>
         ) : (
           <div className="briefcases-grid">
-            {briefcases.map((briefcase) => (
-              <div
-                key={briefcase.id}
-                className={`briefcase ${briefcase.amount === null ? 'empty' : ''} ${
-                  briefcase.isPlayerCase ? 'player-case' : ''
-                } ${briefcase.isOpened ? 'opened' : ''}`}
-                onClick={() => handleCaseClick(briefcase.id)}
-              >
-                {briefcase.amount !== null && !briefcase.isOpened && (
-                  <img 
-                    src={`/briefcases/briefcase${String(briefcase.id).padStart(2, '0')}.png`}
-                    alt={`Case ${briefcase.id}`}
-                    className="briefcase-image"
-                  />
-                )}
-              </div>
-            ))}
+            {briefcases.map((briefcase) => {
+              const shouldRemove = casesToRemove.includes(briefcase.id)
+              return (
+                <div
+                  key={briefcase.id}
+                  className={`briefcase ${briefcase.amount === null ? 'empty' : ''} ${
+                    briefcase.isPlayerCase ? 'player-case' : ''
+                  } ${briefcase.isOpened && !shouldRemove ? 'opened' : ''} ${
+                    shouldRemove ? 'removed' : ''
+                  }`}
+                  onClick={() => handleCaseClick(briefcase.id)}
+                >
+                  {briefcase.amount !== null && !briefcase.isOpened && !shouldRemove && (
+                    <img 
+                      src={`/briefcases/briefcase${String(briefcase.id).padStart(2, '0')}.png`}
+                      alt={`Case ${briefcase.id}`}
+                      className="briefcase-image"
+                    />
+                  )}
+                  {briefcase.isOpened && !briefcase.isPlayerCase && !shouldRemove && (
+                    <div className="opened-briefcase">
+                      <img 
+                        src="/briefcases/briefcase-open.png"
+                        alt="Opened Case"
+                        className="briefcase-open-image"
+                      />
+                      <div className="briefcase-amount">
+                        ₱ {briefcase.amount?.toLocaleString('en-PH')}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
         )}
       </div>

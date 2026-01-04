@@ -67,6 +67,10 @@ function App() {
     setIsGameActive(true)
   }
 
+  const handleGameEnd = (winnings: number) => {
+    setPlayerScores([...playerScores, { name: currentPlayer, winnings }])
+  }
+
   const handleReset = async () => {
     setIsGameActive(false)
     setCurrentPlayer('')
@@ -85,7 +89,12 @@ function App() {
   return (
     <>
       {isGameActive ? (
-        <GameScreen playerName={currentPlayer} onReset={handleReset} />
+        <GameScreen 
+          playerName={currentPlayer} 
+          onReset={handleReset}
+          onGameEnd={handleGameEnd}
+          playerScores={playerScores}
+        />
       ) : (
         <div className="intro-screen">
           <img 
