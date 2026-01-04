@@ -36,8 +36,20 @@
   bottom: 10px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 10px;
   align-items: center;
+}
+
+.error-message {
+  color: #ff4444;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  max-width: 300px;
+  border: 2px solid #ff4444;
 }
 
 .player-name-input {

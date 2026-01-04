@@ -1,10 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
 
+interface PlayerScore {
+  name: string
+  winnings: number
+}
+
 function App() {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playerName, setPlayerName] = useState('')
   const [isMuted, setIsMuted] = useState(false)
+  const [playerScores, setPlayerScores] = useState<PlayerScore[]>([])
+  const [nameError, setNameError] = useState('')
 
   useEffect(() => {
     const playAudio = async () => {
@@ -37,10 +44,24 @@ function App() {
   }, [])
 
   const handleStartGame = () => {
+    const trimmedName = playerName.trim()
+    
+    const isDuplicate = playerScores.some(
+      player => player.name.toLowerCase() === trimmedName.toLowerCase()
+    )
+    
+    if (isDuplicate) {
+      setNameError('This player name has already been used. Please choose a different name.')
+      return
+    }
+    
+    setNameError('')
+    
     if (audioRef.current) {
       audioRef.current.pause()
     }
-    console.log('Starting game...')
+    
+    console.log('Starting game for player:', trimmedName)
   }
 
   const toggleMute = () => {
@@ -66,8 +87,12 @@ function App() {
           className="player-name-input" 
           placeholder="Player Name..."
           value={playerName}
-          onChange={(e) => setPlayerName(e.target.value)}
+          onChange={(e) => {
+            setPlayerName(e.target.value)
+            setNameError('')
+          }}
         />
+        {nameError && <div className="error-message">{nameError}</div>}
         <button 
           className="start-button" 
           onClick={handleStartGame}
