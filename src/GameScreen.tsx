@@ -33,7 +33,8 @@ function GameScreen({ playerName, onReset }: GameScreenProps) {
           <div className="scoreboard-values">
             {PESO_VALUES.map((value, index) => (
               <div key={index} className="scoreboard-item">
-                ₱{value.toLocaleString('en-PH')}
+                <span className="peso-symbol">₱</span>
+                <span className="amount-value">{value.toLocaleString('en-PH')}</span>
               </div>
             ))}
           </div>
