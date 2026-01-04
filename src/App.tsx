@@ -82,46 +82,48 @@ function App() {
     }
   }
 
-  if (isGameActive) {
-    return <GameScreen playerName={currentPlayer} onReset={handleReset} />
-  }
-
   return (
-    <div className="intro-screen">
-      <img 
-        src="/deal-no-deal-intro.gif" 
-        alt="Deal or No Deal" 
-        className="intro-gif"
-      />
-      <div className="intro-controls">
-        <input 
-          type="text" 
-          className="player-name-input" 
-          placeholder="Player Name..."
-          value={playerName}
-          onChange={(e) => {
-            setPlayerName(e.target.value)
-            setNameError('')
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && playerName.trim()) {
-              handleStartGame()
-            }
-          }}
-        />
-        {nameError && <div className="error-message">{nameError}</div>}
-        <button 
-          className="start-button" 
-          onClick={handleStartGame}
-          disabled={!playerName.trim()}
-        >
-          Start New Game
-        </button>
-      </div>
+    <>
+      {isGameActive ? (
+        <GameScreen playerName={currentPlayer} onReset={handleReset} />
+      ) : (
+        <div className="intro-screen">
+          <img 
+            src="/deal-no-deal-intro.gif" 
+            alt="Deal or No Deal" 
+            className="intro-gif"
+          />
+          <div className="intro-controls">
+            <input 
+              type="text" 
+              className="player-name-input" 
+              placeholder="Player Name..."
+              value={playerName}
+              onChange={(e) => {
+                setPlayerName(e.target.value)
+                setNameError('')
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && playerName.trim()) {
+                  handleStartGame()
+                }
+              }}
+            />
+            {nameError && <div className="error-message">{nameError}</div>}
+            <button 
+              className="start-button" 
+              onClick={handleStartGame}
+              disabled={!playerName.trim()}
+            >
+              Start New Game
+            </button>
+          </div>
+        </div>
+      )}
       <audio ref={audioRef} loop>
         <source src="/theme-song.mp3" type="audio/mpeg" />
       </audio>
-    </div>
+    </>
   )
 }
 
