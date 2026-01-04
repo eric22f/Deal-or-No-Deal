@@ -136,7 +136,7 @@
 
 .player-case-container .opened-briefcase {
   width: 150px;
-  height: 150px;
+  height: 130px;
 }
 
 .player-case-container .briefcase-amount {
@@ -145,7 +145,7 @@
 }
 
 .open-briefcase-button {
-  padding: 2px 40px;
+  padding: 2px 30px;
   font-size: 18px;
   font-weight: bold;
   color: #fff;
@@ -157,7 +157,8 @@
   letter-spacing: 2px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
   transition: transform 0.2s, box-shadow 0.2s;
-  margin-bottom: 15px;
+  margin-top: -15px;
+  margin-bottom: 5px;
 }
 
 .open-briefcase-button:hover {
