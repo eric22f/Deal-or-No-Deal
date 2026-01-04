@@ -7,10 +7,10 @@
 .left-panel {
   width: 600px;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  padding: 30px;
+  padding: 2px 5px 1px 15px;
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 0px;
   border-right: 3px solid #d4af37;
 }
 
