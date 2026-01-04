@@ -6,8 +6,8 @@ interface GameScreenProps {
   onReset: () => void
 }
 
-const LEFT_COLUMN_VALUES = [0.05, 1, 5, 10, 20, 50, 100, 150, 200, 250, 300, 350]
-const RIGHT_COLUMN_VALUES = [400, 450, 500, 600, 700, 800, 900, 1000, 1200, 1400, 2000, 5000]
+const LEFT_COLUMN_VALUES = [0.05, 1, 5, 10, 20, 50, 100, 125, 150, 200, 250]
+const RIGHT_COLUMN_VALUES = [300, 350, 400, 450, 500, 600, 700, 800, 1000, 2500, 5000]
 const ALL_VALUES = [...LEFT_COLUMN_VALUES, ...RIGHT_COLUMN_VALUES]
 
 type GamePhase = 'SELECT_YOUR_CASE' | 'OPEN_CASES' | 'BANKER_OFFER' | 'GAME_OVER'
@@ -99,7 +99,7 @@ function GameScreen({ playerName, onReset }: GameScreenProps) {
 
   const getMessage = () => {
     if (gamePhase === 'SELECT_YOUR_CASE') {
-      return 'Select your suitcase to begin the game'
+      return 'Select your winning suitcase'
     } else if (gamePhase === 'OPEN_CASES') {
       const remaining = CASES_TO_OPEN_PER_ROUND[currentRound] - casesOpenedThisRound
       return `Open ${remaining} more case${remaining !== 1 ? 's' : ''}`
