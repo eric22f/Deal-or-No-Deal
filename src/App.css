@@ -1,0 +1,85 @@
+.intro-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #000;
+  position: relative;
+}
+
+.intro-gif {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+}
+
+.intro-controls {
+  position: absolute;
+  bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+.player-name-input {
+  padding: 15px 40px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #000;
+  background: #fff;
+  border: 3px solid #000;
+  border-radius: 10px;
+  text-align: center;
+  letter-spacing: 1px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+  min-width: 300px;
+}
+
+.player-name-input::placeholder {
+  color: #808080;
+  font-weight: normal;
+}
+
+.player-name-input:focus {
+  outline: none;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5), 0 0 0 2px #fff;
+}
+
+.start-button {
+  padding: 15px 40px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+  border: 3px solid #fff;
+  border-radius: 10px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s, box-shadow 0.2s;
+  min-width: 300px;
+}
+
+.start-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.7);
+}
+
+.start-button:active {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+}
+
+.start-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.start-button:disabled:hover {
+  transform: none;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+}
