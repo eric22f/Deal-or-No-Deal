@@ -31,6 +31,9 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
   const [openedAmounts, setOpenedAmounts] = useState<number[]>([])
   const [casesToRemove, setCasesToRemove] = useState<number[]>([])
   const [finalWinnings, setFinalWinnings] = useState<number>(0)
+  const [tookDeal, setTookDeal] = useState<boolean>(false)
+  const [briefcaseRevealed, setBriefcaseRevealed] = useState<boolean>(false)
+  const [bankerOffer, setBankerOffer] = useState<number>(0)
 
   useEffect(() => {
     initializeGame()
@@ -81,15 +84,48 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
       setCasesOpenedThisRound(newCasesOpened)
 
       if (newCasesOpened >= CASES_TO_OPEN_PER_ROUND[currentRound]) {
+        const offer = calculateBankerOffer()
+        setBankerOffer(offer)
         setGamePhase('BANKER_OFFER')
       }
     }
   }
 
+  const calculateBankerOffer = (): number => {
+    const unopenedCases = briefcases.filter(b => !b.isOpened && b.amount !== null)
+    const unopenedAmounts = unopenedCases.map(b => b.amount as number)
+    
+    const sum = unopenedAmounts.reduce((acc, val) => acc + val, 0)
+    const average = sum / unopenedAmounts.length
+    
+    let variancePercent: number
+    if (average < 500) {
+      variancePercent = 0.15
+    } else if (average < 1000) {
+      variancePercent = 0.10
+    } else {
+      variancePercent = 0.05
+    }
+    
+    const randomVariance = (Math.random() * 2 - 1) * variancePercent
+    let offer = average * (1 + randomVariance)
+    
+    if (offer < 10) {
+      offer = Math.ceil(offer)
+    } else if (offer < 100) {
+      offer = Math.ceil(offer / 5) * 5
+    } else {
+      offer = Math.ceil(offer / 50) * 50
+    }
+    
+    return offer
+  }
+
   const handleDealOrNoDeal = (isDeal: boolean) => {
     if (isDeal) {
-      const bankerOffer = 2500
-      setFinalWinnings(bankerOffer)
+      const playerCase = briefcases.find(b => b.isPlayerCase)
+      setFinalWinnings(playerCase?.amount || 0)
+      setTookDeal(true)
       onGameEnd(bankerOffer)
       setGamePhase('GAME_OVER')
     } else {
@@ -113,6 +149,10 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
     }
   }
 
+  const handleRevealBriefcase = () => {
+    setBriefcaseRevealed(true)
+  }
+
   const getMessage = () => {
     if (gamePhase === 'SELECT_YOUR_CASE') {
       return 'Which briefcase will you choose?'
@@ -122,7 +162,11 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
     } else if (gamePhase === 'BANKER_OFFER') {
       return 'The banker is calling...'
     } else if (gamePhase === 'GAME_OVER') {
-      return `You Win ₱ ${finalWinnings.toLocaleString('en-PH')}`
+      if (tookDeal) {
+        return `You Win ₱ ${bankerOffer.toLocaleString('en-PH')}`
+      } else {
+        return `You Win ₱ ${finalWinnings.toLocaleString('en-PH')}`
+      }
     }
     return ''
   }
@@ -173,7 +217,7 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
           </div>
         </div>
 
-        {briefcases.find(b => b.isPlayerCase) && (
+        {briefcases.find(b => b.isPlayerCase) && gamePhase !== 'GAME_OVER' && (
           <div className="player-case-display">
             <div className="player-case-label">Your Briefcase</div>
             <div className="player-case-container">
@@ -182,6 +226,39 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
                 alt="Your Case"
                 className="player-case-image"
               />
+            </div>
+          </div>
+        )}
+
+        {gamePhase === 'GAME_OVER' && tookDeal && !briefcaseRevealed && (
+          <div className="player-case-display">
+            <button className="open-briefcase-button" onClick={handleRevealBriefcase}>
+              Open
+            </button>
+            <div className="player-case-container">
+              <img 
+                src={`/briefcases/briefcase${String(briefcases.find(b => b.isPlayerCase)?.id).padStart(2, '0')}.png`}
+                alt="Your Case"
+                className="player-case-image"
+              />
+            </div>
+          </div>
+        )}
+
+        {gamePhase === 'GAME_OVER' && (!tookDeal || briefcaseRevealed) && (
+          <div className="player-case-display">
+            <div className="player-case-label">{tookDeal ? 'Your Briefcase Had' : 'Your Winnings'}</div>
+            <div className="player-case-container">
+              <div className="opened-briefcase">
+                <img 
+                  src="/briefcases/briefcase-open.png"
+                  alt="Your Final Case"
+                  className="briefcase-open-image"
+                />
+                <div className="briefcase-amount">
+                  ₱ {finalWinnings.toLocaleString('en-PH')}
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -194,19 +271,6 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
 
         {gamePhase === 'GAME_OVER' ? (
           <div className="game-over-container">
-            <div className="player-final-case">
-              <div className="opened-briefcase">
-                <img 
-                  src="/briefcases/briefcase-open.png"
-                  alt="Your Final Case"
-                  className="briefcase-open-image"
-                />
-                <div className="briefcase-amount">
-                  ₱ {finalWinnings.toLocaleString('en-PH')}
-                </div>
-              </div>
-            </div>
-
             <div className="leaderboard">
               <div className="leaderboard-title">Leaderboard</div>
               <div className="leaderboard-list">
@@ -225,15 +289,17 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
               </div>
             </div>
 
-            <button className="next-button" onClick={onReset}>
-              Next
-            </button>
+            {(!tookDeal || briefcaseRevealed) && (
+              <button className="next-button" onClick={onReset}>
+                Next
+              </button>
+            )}
           </div>
         ) : gamePhase === 'BANKER_OFFER' ? (
           <div className="banker-offer-container">
             <div className="banker-offer">
               <div className="offer-title">Banker's Offer</div>
-              <div className="offer-amount">₱2,500</div>
+              <div className="offer-amount">₱ {bankerOffer.toLocaleString('en-PH')}</div>
               <div className="offer-buttons">
                 <button className="deal-button" onClick={() => handleDealOrNoDeal(true)}>
                   DEAL

@@ -58,7 +58,7 @@
   color: #d4af37;
   font-weight: bold;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
   text-transform: uppercase;
   letter-spacing: 2px;
 }
@@ -102,8 +102,8 @@
 }
 
 .player-case-display {
-  margin-top: 15px;
-  padding: 15px;
+  margin-top: 10px;
+  padding: 30px;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   border: 2px solid #d4af37;
   border-radius: 8px;
@@ -111,12 +111,13 @@
 }
 
 .player-case-label {
-  font-size: 16px;
+  font-size: 17px;
   color: #d4af37;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-bottom: 10px;
+  margin-top: -15px;
+  margin-bottom: 5px;
 }
 
 .player-case-container {
@@ -126,9 +127,47 @@
 }
 
 .player-case-image {
-  width: 120px;
+  width: 150px;
+  height: 150px;
   height: auto;
   object-fit: contain;
+  margin-bottom: -15px;
+}
+
+.player-case-container .opened-briefcase {
+  width: 150px;
+  height: 150px;
+}
+
+.player-case-container .briefcase-amount {
+  font-size: 20px;
+  margin-top: -20%;
+}
+
+.open-briefcase-button {
+  padding: 2px 40px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(135deg, #249815 0%, #013912 100%);
+  border: 2px solid #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-bottom: 15px;
+}
+
+.open-briefcase-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.7);
+}
+
+.open-briefcase-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .right-panel {
@@ -283,26 +322,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 20px;
   overflow-y: auto;
-}
-
-.player-final-case {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.player-final-case .opened-briefcase {
-  width: 200px;
-  height: 200px;
-}
-
-.player-final-case .briefcase-amount {
-  font-size: 24px;
-  margin-top: -20%;
 }
 
 .leaderboard {
