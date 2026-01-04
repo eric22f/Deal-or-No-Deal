@@ -49,12 +49,16 @@ function GameScreen({ playerName, onReset }: GameScreenProps) {
             </div>
           </div>
         </div>
+        
+        <button className="reset-button-small" onClick={onReset}>
+          Reset
+        </button>
       </div>
 
       <div className="right-panel">
-        <button className="reset-button" onClick={onReset}>
-          Reset Game
-        </button>
+        <div className="game-message">
+          Select your suitcase to begin the game
+        </div>
       </div>
     </div>
   )
