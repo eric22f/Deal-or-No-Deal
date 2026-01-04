@@ -95,20 +95,23 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
     const unopenedCases = briefcases.filter(b => !b.isOpened && b.amount !== null)
     const unopenedAmounts = unopenedCases.map(b => b.amount as number)
     
-    const sum = unopenedAmounts.reduce((acc, val) => acc + val, 0)
-    const average = sum / unopenedAmounts.length
+    const sortedAmounts = [...unopenedAmounts].sort((a, b) => a - b)
+    const middleIndex = Math.floor(sortedAmounts.length / 2)
+    const median = sortedAmounts.length % 2 === 0
+      ? (sortedAmounts[middleIndex - 1] + sortedAmounts[middleIndex]) / 2
+      : sortedAmounts[middleIndex]
     
     let variancePercent: number
-    if (average < 500) {
+    if (median < 500) {
       variancePercent = 0.15
-    } else if (average < 1000) {
+    } else if (median < 1000) {
       variancePercent = 0.10
     } else {
       variancePercent = 0.05
     }
     
     const randomVariance = (Math.random() * 2 - 1) * variancePercent
-    let offer = average * (1 + randomVariance)
+    let offer = median * (1 + randomVariance)
     
     if (offer < 10) {
       offer = Math.ceil(offer)
