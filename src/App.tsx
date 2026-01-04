@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
+import GameScreen from './GameScreen'
 
 interface PlayerScore {
   name: string
@@ -12,6 +13,8 @@ function App() {
   const [isMuted, setIsMuted] = useState(false)
   const [playerScores, setPlayerScores] = useState<PlayerScore[]>([])
   const [nameError, setNameError] = useState('')
+  const [isGameActive, setIsGameActive] = useState(false)
+  const [currentPlayer, setCurrentPlayer] = useState('')
 
   useEffect(() => {
     const playAudio = async () => {
@@ -61,7 +64,18 @@ function App() {
       audioRef.current.pause()
     }
     
-    console.log('Starting game for player:', trimmedName)
+    setCurrentPlayer(trimmedName)
+    setIsGameActive(true)
+  }
+
+  const handleReset = () => {
+    setIsGameActive(false)
+    setCurrentPlayer('')
+    setPlayerName('')
+    
+    if (audioRef.current && !isMuted) {
+      audioRef.current.play()
+    }
   }
 
   const toggleMute = () => {
@@ -69,6 +83,10 @@ function App() {
       audioRef.current.muted = !isMuted
       setIsMuted(!isMuted)
     }
+  }
+
+  if (isGameActive) {
+    return <GameScreen playerName={currentPlayer} onReset={handleReset} />
   }
 
   return (
