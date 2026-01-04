@@ -4,10 +4,35 @@ import './App.css'
 function App() {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playerName, setPlayerName] = useState('')
+  const [isMuted, setIsMuted] = useState(false)
 
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.play()
+    const playAudio = async () => {
+      if (audioRef.current) {
+        try {
+          await audioRef.current.play()
+        } catch (error) {
+          console.log('Autoplay prevented, waiting for user interaction')
+        }
+      }
+    }
+    playAudio()
+
+    const handleInteraction = async () => {
+      if (audioRef.current && audioRef.current.paused) {
+        try {
+          await audioRef.current.play()
+        } catch (error) {
+          console.log('Could not play audio')
+        }
+      }
+      document.removeEventListener('click', handleInteraction)
+    }
+
+    document.addEventListener('click', handleInteraction)
+
+    return () => {
+      document.removeEventListener('click', handleInteraction)
     }
   }, [])
 
@@ -18,8 +43,18 @@ function App() {
     console.log('Starting game...')
   }
 
+  const toggleMute = () => {
+    if (audioRef.current) {
+      audioRef.current.muted = !isMuted
+      setIsMuted(!isMuted)
+    }
+  }
+
   return (
     <div className="intro-screen">
+      <button className="mute-button" onClick={toggleMute}>
+        {isMuted ? '🔇' : '🔊'}
+      </button>
       <img 
         src="/deal-no-deal-intro.gif" 
         alt="Deal or No Deal" 
