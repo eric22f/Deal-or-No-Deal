@@ -3,7 +3,6 @@ import './GameScreen.css'
 
 interface GameScreenProps {
   playerName: string
-  onReset: () => void
 }
 
 const LEFT_COLUMN_VALUES = [0.05, 1, 5, 10, 20, 50, 100, 125, 150, 200, 250]
@@ -21,7 +20,7 @@ interface Briefcase {
 
 const CASES_TO_OPEN_PER_ROUND = [6, 5, 4, 3, 2, 1]
 
-function GameScreen({ playerName, onReset }: GameScreenProps) {
+function GameScreen({ playerName }: GameScreenProps) {
   const [briefcases, setBriefcases] = useState<Briefcase[]>([])
   const [gamePhase, setGamePhase] = useState<GamePhase>('SELECT_YOUR_CASE')
   const [currentRound, setCurrentRound] = useState(0)
@@ -62,7 +61,7 @@ function GameScreen({ playerName, onReset }: GameScreenProps) {
 
     if (gamePhase === 'SELECT_YOUR_CASE') {
       setBriefcases(briefcases.map(c => 
-        c.id === caseId ? { ...c, isPlayerCase: true } : c
+        c.id === caseId ? { ...c, isPlayerCase: true, isOpened: true } : c
       ))
       setGamePhase('OPEN_CASES')
     } else if (gamePhase === 'OPEN_CASES') {
@@ -99,7 +98,7 @@ function GameScreen({ playerName, onReset }: GameScreenProps) {
 
   const getMessage = () => {
     if (gamePhase === 'SELECT_YOUR_CASE') {
-      return 'Select your winning suitcase'
+      return 'Which briefcase will you choose?'
     } else if (gamePhase === 'OPEN_CASES') {
       const remaining = CASES_TO_OPEN_PER_ROUND[currentRound] - casesOpenedThisRound
       return `Open ${remaining} more case${remaining !== 1 ? 's' : ''}`
@@ -116,7 +115,6 @@ function GameScreen({ playerName, onReset }: GameScreenProps) {
     <div className="game-screen">
       <div className="left-panel">
         <div className="player-info">
-          <div className="player-label">Player</div>
           <div className="player-name">{playerName}</div>
         </div>
         
@@ -155,10 +153,19 @@ function GameScreen({ playerName, onReset }: GameScreenProps) {
             </div>
           </div>
         </div>
-        
-        <button className="reset-button-small" onClick={onReset}>
-          Reset
-        </button>
+
+        {briefcases.find(b => b.isPlayerCase) && (
+          <div className="player-case-display">
+            <div className="player-case-label">Your Briefcase</div>
+            <div className="player-case-container">
+              <img 
+                src={`/briefcases/briefcase${String(briefcases.find(b => b.isPlayerCase)?.id).padStart(2, '0')}.png`}
+                alt="Your Case"
+                className="player-case-image"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="right-panel">
