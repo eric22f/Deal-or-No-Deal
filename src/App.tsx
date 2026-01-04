@@ -67,13 +67,18 @@ function App() {
     setIsGameActive(true)
   }
 
-  const handleReset = () => {
+  const handleReset = async () => {
     setIsGameActive(false)
     setCurrentPlayer('')
     setPlayerName('')
     
     if (audioRef.current) {
-      audioRef.current.play()
+      audioRef.current.currentTime = 0
+      try {
+        await audioRef.current.play()
+      } catch (error) {
+        console.log('Could not play audio on reset')
+      }
     }
   }
 
@@ -97,6 +102,11 @@ function App() {
           onChange={(e) => {
             setPlayerName(e.target.value)
             setNameError('')
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && playerName.trim()) {
+              handleStartGame()
+            }
           }}
         />
         {nameError && <div className="error-message">{nameError}</div>}
