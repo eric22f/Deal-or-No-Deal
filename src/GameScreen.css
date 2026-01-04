@@ -145,7 +145,7 @@
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   border: 2px solid #d4af37;
   border-radius: 8px;
-  margin-bottom: 30px;
+  margin-bottom: 3px;
   text-transform: uppercase;
   letter-spacing: 1px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
@@ -160,7 +160,7 @@
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   gap: 15px;
-  padding: 20px;
+  padding: 0;
   flex: 1;
   align-content: start;
 }
