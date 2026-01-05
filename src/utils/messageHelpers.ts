@@ -43,7 +43,7 @@ export function getGameMessage(
 }
 
 export function shouldShowMessage(gamePhase: GamePhase): boolean {
-  return ['SELECT_YOUR_CASE', 'OPEN_CASES', 'BANKER_THINKING'].includes(gamePhase)
+  return ['SELECT_YOUR_CASE', 'OPEN_CASES', 'BANKER_THINKING', 'FINAL_CHOICE'].includes(gamePhase)
 }
 
 export function shouldShowAnswerButton(gamePhase: GamePhase): boolean {
