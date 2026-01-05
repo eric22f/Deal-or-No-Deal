@@ -115,6 +115,9 @@
   border: 2px solid #d4af37;
   border-radius: 8px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .player-case-label {
@@ -393,13 +396,15 @@
 }
 
 .briefcase-amount {
-  position: relative;
+  position: absolute;
   z-index: 1;
   font-size: 16px;
   font-weight: bold;
   color: #d4af37;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
-  margin-top: -17%;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .game-over-container {

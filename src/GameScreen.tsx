@@ -485,15 +485,16 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
         )}
 
         {gamePhase === 'GAME_OVER' && tookDeal && !briefcaseRevealed && (
-          <div className="player-case-display">
-            <button className="open-briefcase-button" onClick={handleRevealBriefcase}>
-              Open
-            </button>
+          <div 
+            className="player-case-display"
+            onClick={handleRevealBriefcase}
+          >
+            <div className="player-case-label">Your Briefcase</div>
             <div className="player-case-container">
               <img 
                 src={`/briefcases/briefcase${String(briefcases.find(b => b.isPlayerCase)?.id).padStart(2, '0')}.png`}
                 alt="Your Case"
-                className="player-case-image"
+                className="player-case-image clickable-pulse"
               />
             </div>
           </div>
@@ -522,6 +523,15 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
         {gamePhase !== 'BANKER_THINKING' && gamePhase !== 'BANKER_CALLING' && gamePhase !== 'FINAL_CHOICE' && gamePhase !== 'GAME_OVER' && (
           <div className="game-message">
             {getMessage()}
+          </div>
+        )}
+
+        {gamePhase === 'GAME_OVER' && tookDeal && !briefcaseRevealed && (
+          <div className="game-message-with-button">
+            <div className="game-message-text">Open your briefcase to see what you could have won.</div>
+            <button className="answer-button" onClick={onReset} style={{ visibility: 'hidden' }}>
+              Next
+            </button>
           </div>
         )}
 
