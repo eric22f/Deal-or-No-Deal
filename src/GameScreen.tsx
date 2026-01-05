@@ -315,7 +315,7 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
       setTookDeal(true)
       
       let soundFile = ''
-      if (bankerOffer < 50) {
+      if (bankerOffer <= 50) {
         soundFile = '/laugh01.mp3'
       } else if (playerCase && playerCase.amount !== null) {
         if (bankerOffer > playerCase.amount) {
@@ -373,7 +373,7 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
     setFinalWinnings(chosenAmount || 0)
     
     let soundFile = ''
-    if (chosenAmount !== null && chosenAmount < 50) {
+    if (chosenAmount !== null && chosenAmount <= 50) {
       soundFile = '/laugh01.mp3'
     } else if (chosenAmount !== null && otherAmount !== null) {
       if (chosenAmount > otherAmount) {
