@@ -12,7 +12,7 @@ const LEFT_COLUMN_VALUES = [0.05, 1, 5, 10, 20, 50, 100, 125, 150, 200, 250]
 const RIGHT_COLUMN_VALUES = [300, 350, 400, 450, 500, 600, 700, 800, 1000, 2500, 5000]
 const ALL_VALUES = [...LEFT_COLUMN_VALUES, ...RIGHT_COLUMN_VALUES]
 
-type GamePhase = 'SELECT_YOUR_CASE' | 'OPEN_CASES' | 'BANKER_OFFER' | 'GAME_OVER'
+type GamePhase = 'SELECT_YOUR_CASE' | 'OPEN_CASES' | 'BANKER_THINKING' | 'BANKER_CALLING' | 'BANKER_OFFER' | 'GAME_OVER'
 
 interface Briefcase {
   id: number
@@ -34,6 +34,8 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
   const [tookDeal, setTookDeal] = useState<boolean>(false)
   const [briefcaseRevealed, setBriefcaseRevealed] = useState<boolean>(false)
   const [bankerOffer, setBankerOffer] = useState<number>(0)
+  const [bankerRemark, setBankerRemark] = useState<string>('')
+  const [phoneAudio, setPhoneAudio] = useState<HTMLAudioElement | null>(null)
 
   useEffect(() => {
     initializeGame()
@@ -134,11 +136,110 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
       setCasesOpenedThisRound(newCasesOpened)
 
       if (newCasesOpened >= CASES_TO_OPEN_PER_ROUND[currentRound]) {
-        const offer = calculateBankerOffer()
-        setBankerOffer(offer)
-        setGamePhase('BANKER_OFFER')
+        setGamePhase('BANKER_THINKING')
+        
+        let minDelay, maxDelay
+        if (currentRound === 0) {
+          minDelay = 20000
+          maxDelay = 40000
+        } else if (currentRound === 1) {
+          minDelay = 15000
+          maxDelay = 30000
+        } else if (currentRound === 2) {
+          minDelay = 10000
+          maxDelay = 30000
+        } else {
+          minDelay = 5000
+          maxDelay = 25000
+        }
+        
+        const delay = Math.random() * (maxDelay - minDelay) + minDelay
+        
+        setTimeout(() => {
+          setGamePhase('BANKER_CALLING')
+          const audio = new Audio('/banker-phone.mp3')
+          audio.loop = true
+          audio.play().catch(err => console.log('Could not play phone sound:', err))
+          setPhoneAudio(audio)
+        }, delay)
       }
     }
+  }
+
+  const getBankerRemark = (offer: number): string => {
+    const unopenedCases = briefcases.filter(b => !b.isOpened && b.amount !== null && !b.isPlayerCase)
+    const unopenedAmounts = unopenedCases.map(b => b.amount as number)
+    const avgRemaining = unopenedAmounts.reduce((a, b) => a + b, 0) / unopenedAmounts.length
+    
+    const offerQuality = offer / avgRemaining
+    
+    const remarks = {
+      terrible: [
+        "Is that a joke? My piggy bank has more than that!",
+        "The banker must be laughing all the way to the bank with that offer!",
+        "That's not an offer, that's an insult wrapped in pesos!",
+        "I've seen better offers at a garage sale!",
+        "The banker thinks you were born yesterday with that lowball!"
+      ],
+      poor: [
+        "Hmm, the banker is being a bit stingy today...",
+        "That's barely enough for a nice dinner, let alone life-changing money!",
+        "The banker is clearly hoping you'll panic!",
+        "You could probably find more money in your couch cushions!",
+        "That offer is weaker than my morning coffee!"
+      ],
+      fair: [
+        "Now we're talking! A respectable offer on the table.",
+        "The banker is playing it safe with this one.",
+        "Not bad, not bad at all... but is it enough?",
+        "A solid offer, but there could be more in your case!",
+        "The banker is being reasonable... suspiciously reasonable!"
+      ],
+      good: [
+        "WOW! The banker is getting nervous!",
+        "That's a serious offer! Someone's sweating in that bank!",
+        "The banker must really want you to take this deal!",
+        "Now THAT'S what I call an offer! The banker sees something!",
+        "Holy pesos! The banker is practically begging you to stop!"
+      ],
+      excellent: [
+        "JACKPOT ALERT! The banker is in full panic mode!",
+        "That's an INSANE offer! The banker knows you've got the goods!",
+        "The banker just threw the kitchen sink at you!",
+        "I can hear the banker crying from here with that offer!",
+        "That's 'retire early' money right there! The banker is DESPERATE!"
+      ]
+    }
+    
+    let remarkCategory: keyof typeof remarks
+    if (offerQuality < 0.3) {
+      remarkCategory = 'terrible'
+    } else if (offerQuality < 0.6) {
+      remarkCategory = 'poor'
+    } else if (offerQuality < 0.9) {
+      remarkCategory = 'fair'
+    } else if (offerQuality < 1.2) {
+      remarkCategory = 'good'
+    } else {
+      remarkCategory = 'excellent'
+    }
+    
+    const categoryRemarks = remarks[remarkCategory]
+    return categoryRemarks[Math.floor(Math.random() * categoryRemarks.length)]
+  }
+
+  const handleAnswerCall = () => {
+    if (phoneAudio) {
+      phoneAudio.pause()
+      phoneAudio.currentTime = 0
+      setPhoneAudio(null)
+    }
+    
+    const offer = calculateBankerOffer()
+    setBankerOffer(offer)
+    const remark = getBankerRemark(offer)
+    setBankerRemark(remark)
+    setGamePhase('BANKER_OFFER')
   }
 
   const calculateBankerOffer = (): number => {
@@ -212,8 +313,12 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
     } else if (gamePhase === 'OPEN_CASES') {
       const remaining = CASES_TO_OPEN_PER_ROUND[currentRound] - casesOpenedThisRound
       return `Open ${remaining} more case${remaining !== 1 ? 's' : ''}`
+    } else if (gamePhase === 'BANKER_THINKING') {
+      return 'Banker is Thinking....'
+    } else if (gamePhase === 'BANKER_CALLING') {
+      return 'The Banker is calling...'
     } else if (gamePhase === 'BANKER_OFFER') {
-      return 'The banker is calling...'
+      return bankerRemark
     } else if (gamePhase === 'GAME_OVER') {
       if (tookDeal) {
         return `You Win ₱ ${bankerOffer.toLocaleString('en-PH')}`
@@ -348,6 +453,53 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
               </button>
             )}
           </div>
+        ) : gamePhase === 'BANKER_THINKING' || gamePhase === 'BANKER_CALLING' ? (
+          <>
+            <div className="game-message-with-button">
+              <div className="game-message-text">{getMessage()}</div>
+              {gamePhase === 'BANKER_CALLING' && (
+                <button className="answer-button" onClick={handleAnswerCall}>
+                  Answer
+                </button>
+              )}
+            </div>
+            <div className="briefcases-grid">
+              {briefcases.map((briefcase) => {
+                const shouldRemove = casesToRemove.includes(briefcase.id)
+                return (
+                  <div
+                    key={briefcase.id}
+                    className={`briefcase ${briefcase.amount === null ? 'empty' : ''} ${
+                      briefcase.isPlayerCase ? 'player-case' : ''
+                    } ${briefcase.isOpened && !shouldRemove ? 'opened' : ''} ${
+                      shouldRemove ? 'removed' : ''
+                    }`}
+                    onClick={() => handleCaseClick(briefcase.id)}
+                  >
+                    {briefcase.amount !== null && !briefcase.isOpened && !shouldRemove && (
+                      <img 
+                        src={`/briefcases/briefcase${String(briefcase.id).padStart(2, '0')}.png`}
+                        alt={`Case ${briefcase.id}`}
+                        className="briefcase-image"
+                      />
+                    )}
+                    {briefcase.isOpened && !briefcase.isPlayerCase && !shouldRemove && (
+                      <div className="opened-briefcase">
+                        <img 
+                          src="/briefcases/briefcase-open.png"
+                          alt="Opened Case"
+                          className="briefcase-open-image"
+                        />
+                        <div className="briefcase-amount">
+                          ₱ {briefcase.amount?.toLocaleString('en-PH')}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </>
         ) : gamePhase === 'BANKER_OFFER' ? (
           <div className="banker-offer-container">
             <div className="banker-offer">
