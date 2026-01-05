@@ -175,7 +175,7 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
     setButtonsDisabled(true)
     
     const offer = calculateBankerOffer(state.briefcases)
-    const remark = getBankerRemark(offer, state.briefcases)
+    const remark = getBankerRemark(offer)
     dispatch({ type: 'SET_BANKER_OFFER', offer, remark })
     
     setTimeout(() => {

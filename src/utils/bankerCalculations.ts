@@ -71,21 +71,15 @@ export const calculateBankerOffer = (briefcases: Briefcase[]): number => {
   return offer
 }
 
-export const getBankerRemark = (offer: number, briefcases: Briefcase[]): string => {
-  const unopenedCases = briefcases.filter(b => !b.isOpened && b.amount !== null && !b.isPlayerCase)
-  const unopenedAmounts = unopenedCases.map(b => b.amount as number)
-  const avgRemaining = unopenedAmounts.reduce((a, b) => a + b, 0) / unopenedAmounts.length
-  
-  const offerQuality = offer / avgRemaining
-  
+export const getBankerRemark = (offer: number): string => {
   let remarkCategory: RemarkCategory
-  if (offerQuality < 0.3) {
+  if (offer < 250) {
     remarkCategory = 'terrible'
-  } else if (offerQuality < 0.6) {
+  } else if (offer < 500) {
     remarkCategory = 'poor'
-  } else if (offerQuality < 0.9) {
+  } else if (offer < 750) {
     remarkCategory = 'fair'
-  } else if (offerQuality < 1.2) {
+  } else if (offer < 1000) {
     remarkCategory = 'good'
   } else {
     remarkCategory = 'excellent'
