@@ -313,6 +313,25 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
       const playerCase = briefcases.find(b => b.isPlayerCase)
       setFinalWinnings(playerCase?.amount || 0)
       setTookDeal(true)
+      
+      let soundFile = ''
+      if (bankerOffer < 50) {
+        soundFile = '/laugh01.mp3'
+      } else if (playerCase && playerCase.amount !== null) {
+        if (bankerOffer > playerCase.amount) {
+          soundFile = '/cheer/cheer05.wav'
+        } else {
+          soundFile = '/aww/aww03.mp3'
+        }
+      }
+      
+      if (soundFile) {
+        setTimeout(() => {
+          const audio = new Audio(soundFile)
+          audio.play().catch(err => console.log('Could not play sound:', err))
+        }, 100)
+      }
+      
       onGameEnd(bankerOffer)
       setGamePhase('GAME_OVER')
     } else {
