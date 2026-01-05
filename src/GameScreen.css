@@ -146,39 +146,14 @@
 
 .player-case-container .opened-briefcase {
   width: 150px;
-  height: 130px;
+  height: 110px;
+  margin-bottom: -25px;
 }
 
 .player-case-container .briefcase-amount {
   font-size: 20px;
-  margin-top: -20%;
-}
-
-.open-briefcase-button {
-  padding: 2px 30px;
-  font-size: 18px;
-  font-weight: bold;
-  color: #fff;
-  background: linear-gradient(135deg, #249815 0%, #013912 100%);
-  border: 2px solid #fff;
-  border-radius: 8px;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-  transition: transform 0.2s, box-shadow 0.2s;
-  margin-top: -15px;
-  margin-bottom: 5px;
-}
-
-.open-briefcase-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.7);
-}
-
-.open-briefcase-button:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  margin-top: -5%;
+  text-wrap: nowrap;
 }
 
 .right-panel {
@@ -379,7 +354,7 @@
 
 @keyframes fadeIn {
   0% {
-    opacity: 0;
+    opacity: 0.15;
   }
   100% {
     opacity: 1;
@@ -402,9 +377,10 @@
   font-weight: bold;
   color: #d4af37;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
-  top: 25%;
+  top: 37%;
   left: 50%;
   transform: translate(-50%, -50%);
+  white-space: nowrap;
 }
 
 .game-over-container {
