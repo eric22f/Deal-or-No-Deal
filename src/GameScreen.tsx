@@ -180,7 +180,7 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
     
     setTimeout(() => {
       setButtonsDisabled(false)
-    }, 5400)
+    }, 3300)
     
     setTimeout(() => {
       const randomDealOrNo = Math.floor(Math.random() * 3) + 1
@@ -200,7 +200,7 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
         offerAudioRef.current = offerAudio
         offerAudio.play().catch(err => console.log('Could not play offer audio:', err))
       })
-    }, 2500)
+    }, 500)
   }
 
   const handleDealOrNoDeal = (isDeal: boolean) => {
@@ -399,7 +399,7 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
 
         {shouldShowLeaderboard(state.gamePhase) && (
           <div className="game-over-container">
-            <div className="game-message-with-button">
+            <div className="game-message-gold-border">
               <div className="game-message-text">{message}</div>
               {(!state.tookDeal || state.briefcaseRevealed) && (
                 <button className="answer-button" onClick={onReset}>
