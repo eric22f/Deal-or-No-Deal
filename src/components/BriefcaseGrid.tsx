@@ -1,0 +1,66 @@
+import type { ReactElement } from 'react'
+import type { Briefcase, GamePhase } from '../types/game'
+
+interface BriefcaseGridProps {
+  briefcases: Briefcase[]
+  gamePhase: GamePhase
+  casesToRemove: number[]
+  onCaseClick: (caseId: number) => void
+  onFinalChoice: (choosePlayerCase: boolean) => void
+}
+
+export function BriefcaseGrid({
+  briefcases,
+  gamePhase,
+  casesToRemove,
+  onCaseClick,
+  onFinalChoice
+}: BriefcaseGridProps): ReactElement {
+  return (
+    <div className="briefcases-grid">
+      {briefcases.map((briefcase) => {
+        if (briefcase.amount === null) return null
+        
+        const shouldRemove = casesToRemove.includes(briefcase.id)
+        const isClickable = 
+          (gamePhase === 'SELECT_YOUR_CASE' || 
+           (gamePhase === 'OPEN_CASES' && !briefcase.isPlayerCase && !briefcase.isOpened) ||
+           (gamePhase === 'FINAL_CHOICE' && !briefcase.isPlayerCase && !briefcase.isOpened))
+        
+        return (
+          <div
+            key={briefcase.id}
+            className={`briefcase ${briefcase.isPlayerCase ? 'player-case' : ''} ${briefcase.isOpened ? 'opened' : ''} ${shouldRemove ? 'removed' : ''} ${isClickable ? 'clickable' : ''}`}
+            onClick={() => {
+              if (gamePhase === 'FINAL_CHOICE' && !briefcase.isPlayerCase && !briefcase.isOpened) {
+                onFinalChoice(false)
+              } else if (isClickable) {
+                onCaseClick(briefcase.id)
+              }
+            }}
+          >
+            {!briefcase.isOpened ? (
+              <img 
+                src={`/briefcases/briefcase${String(briefcase.id).padStart(2, '0')}.png`}
+                alt={`Case ${briefcase.id}`}
+                className="briefcase-image"
+              />
+            ) : null}
+            {briefcase.isOpened && !briefcase.isPlayerCase && !shouldRemove && (
+              <div className="opened-briefcase">
+                <img 
+                  src="/briefcases/briefcase-open.png"
+                  alt="Opened Case"
+                  className="briefcase-open-image"
+                />
+                <div className="briefcase-amount">
+                  ₱ {briefcase.amount?.toLocaleString('en-PH')}
+                </div>
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
