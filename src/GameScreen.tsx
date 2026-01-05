@@ -164,6 +164,11 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
     state.bankerOffer
   )
 
+  // Include current player's score in leaderboard if game is over
+  const displayScores = state.gamePhase === 'GAME_OVER' 
+    ? [...playerScores, { name: playerName, winnings: state.finalWinnings }]
+    : playerScores
+
   return (
     <div className="game-screen">
       <div className="left-panel">
@@ -263,25 +268,26 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
                 </button>
               )}
             </div>
-            <Leaderboard playerScores={playerScores} currentPlayerName={playerName} />
+            {shouldShowRevealMessage(state.gamePhase, state.tookDeal, state.briefcaseRevealed) && (
+              <div className="game-message reveal-message-banner">
+                Open your briefcase to see what you could have won.
+              </div>
+            )}
+            <Leaderboard playerScores={displayScores} currentPlayerName={playerName} />
           </div>
         )}
 
-        {shouldShowRevealMessage(state.gamePhase, state.tookDeal, state.briefcaseRevealed) && (
-          <div className="reveal-message">
-            Open your briefcase to see what you could have won.
+        {!(state.gamePhase === 'GAME_OVER' && state.tookDeal) && (
+          <div className={`briefcase-grid-container ${state.gamePhase === 'BANKER_OFFER' ? 'fade-out' : ''}`}>
+            <BriefcaseGrid
+              briefcases={state.briefcases}
+              gamePhase={state.gamePhase}
+              casesToRemove={state.casesToRemove}
+              onCaseClick={handleCaseClick}
+              onFinalChoice={handleFinalChoice}
+            />
           </div>
         )}
-
-        <div className={`briefcase-grid-container ${state.gamePhase === 'BANKER_OFFER' || (state.gamePhase === 'GAME_OVER' && state.tookDeal) ? 'fade-out' : ''}`}>
-          <BriefcaseGrid
-            briefcases={state.briefcases}
-            gamePhase={state.gamePhase}
-            casesToRemove={state.casesToRemove}
-            onCaseClick={handleCaseClick}
-            onFinalChoice={handleFinalChoice}
-          />
-        </div>
       </div>
     </div>
   )

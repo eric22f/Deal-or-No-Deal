@@ -163,7 +163,7 @@
   padding: 15px 15px 0 15px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
   max-height: 100vh;
 }
 
@@ -395,6 +395,8 @@
   justify-content: flex-start;
   padding: 0;
   overflow-y: auto;
+  position: relative;
+  z-index: 1;
 }
 
 .leaderboard {
