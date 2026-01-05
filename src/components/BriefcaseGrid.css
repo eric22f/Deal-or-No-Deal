@@ -14,7 +14,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  cursor: default;
   transition: transform 0.2s;
   width: 100%;
   max-width: 120px;
@@ -72,7 +72,8 @@
   pointer-events: none;
 }
 
-.briefcase:not(.empty):not(.opened):hover {
+.briefcase.clickable:hover,
+.briefcase.clickable-pulse:hover {
   transform: scale(1.1);
 }
 
