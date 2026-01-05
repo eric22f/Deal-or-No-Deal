@@ -1,4 +1,5 @@
 import type { ReactElement } from 'react'
+import './PrizeBoard.css'
 
 interface PrizeBoardProps {
   leftColumn: number[]

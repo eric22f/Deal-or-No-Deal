@@ -1,5 +1,7 @@
 import type { ReactElement } from 'react'
 import type { Briefcase, GamePhase } from '../types/game'
+import './BriefcaseGrid.css'
+import '../styles/animations.css'
 
 interface BriefcaseGridProps {
   briefcases: Briefcase[]

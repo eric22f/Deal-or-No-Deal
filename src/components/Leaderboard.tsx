@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react'
 import type { PlayerScore } from '../types/game'
+import './Leaderboard.css'
 
 interface LeaderboardProps {
   playerScores: PlayerScore[]

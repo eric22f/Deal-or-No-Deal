@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import './GameScreen.css'
+import './styles/animations.css'
 import type { PlayerScore } from './types/game'
 import { LEFT_COLUMN_VALUES, RIGHT_COLUMN_VALUES, BANKER_THINKING_DELAYS } from './constants/gameConfig'
 import { calculateBankerOffer, getBankerRemark } from './utils/bankerCalculations'
