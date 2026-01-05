@@ -323,6 +323,16 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
       offer = Math.ceil(offer / 50) * 50
     }
     
+    // Ensure offer is strictly between min and max values
+    const minValue = sortedAmounts[0]
+    const maxValue = sortedAmounts[sortedAmounts.length - 1]
+    
+    if (offer <= minValue) {
+      offer = minValue + (minValue < 10 ? 1 : minValue < 100 ? 5 : 50)
+    } else if (offer >= maxValue) {
+      offer = maxValue - (maxValue < 10 ? 1 : maxValue < 100 ? 5 : 50)
+    }
+    
     return offer
   }
 
