@@ -43,6 +43,7 @@ export function PlayerBriefcase({
 
   // Game over - show revealed briefcase
   if (gamePhase === 'GAME_OVER' && (!tookDeal || briefcaseRevealed)) {
+    const displayAmount = tookDeal ? (briefcase.amount || 0) : finalWinnings
     return (
       <div className="player-case-display">
         <div className="player-case-label">{tookDeal ? 'Your Briefcase Had' : 'Your Winnings'}</div>
@@ -54,7 +55,7 @@ export function PlayerBriefcase({
               className="briefcase-open-image"
             />
             <div className="briefcase-amount">
-              ₱ {finalWinnings.toLocaleString('en-PH')}
+              ₱ {displayAmount.toLocaleString('en-PH')}
             </div>
           </div>
         </div>
