@@ -530,18 +530,55 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
             <div className="leaderboard">
               <div className="leaderboard-title">Leaderboard</div>
               <div className="leaderboard-list">
-                {playerScores
-                  .sort((a, b) => b.winnings - a.winnings)
-                  .map((player, index) => (
-                    <div 
-                      key={index}
-                      className={`leaderboard-item ${player.name === playerName ? 'current-player' : ''}`}
-                    >
-                      <span className="leaderboard-rank">{index + 1}.</span>
-                      <span className="leaderboard-name">{player.name}</span>
-                      <span className="leaderboard-winnings">₱ {player.winnings.toLocaleString('en-PH')}</span>
-                    </div>
-                  ))}
+                {(() => {
+                  const sortedPlayers = playerScores.sort((a, b) => b.winnings - a.winnings)
+                  const playersPerColumn = Math.ceil(sortedPlayers.length / 3)
+                  
+                  const column1 = sortedPlayers.slice(0, playersPerColumn)
+                  const column2 = sortedPlayers.slice(playersPerColumn, playersPerColumn * 2)
+                  const column3 = sortedPlayers.slice(playersPerColumn * 2)
+                  
+                  return (
+                    <>
+                      <div className="leaderboard-column">
+                        {column1.map((player, index) => (
+                          <div 
+                            key={index}
+                            className={`leaderboard-item ${player.name === playerName ? 'current-player' : ''}`}
+                          >
+                            <span className="leaderboard-rank">{index + 1}.</span>
+                            <span className="leaderboard-name">{player.name}</span>
+                            <span className="leaderboard-winnings">₱ {player.winnings.toLocaleString('en-PH')}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="leaderboard-column">
+                        {column2.map((player, index) => (
+                          <div 
+                            key={index}
+                            className={`leaderboard-item ${player.name === playerName ? 'current-player' : ''}`}
+                          >
+                            <span className="leaderboard-rank">{playersPerColumn + index + 1}.</span>
+                            <span className="leaderboard-name">{player.name}</span>
+                            <span className="leaderboard-winnings">₱ {player.winnings.toLocaleString('en-PH')}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="leaderboard-column">
+                        {column3.map((player, index) => (
+                          <div 
+                            key={index}
+                            className={`leaderboard-item ${player.name === playerName ? 'current-player' : ''}`}
+                          >
+                            <span className="leaderboard-rank">{playersPerColumn * 2 + index + 1}.</span>
+                            <span className="leaderboard-name">{player.name}</span>
+                            <span className="leaderboard-winnings">₱ {player.winnings.toLocaleString('en-PH')}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )
+                })()}
               </div>
             </div>
 
