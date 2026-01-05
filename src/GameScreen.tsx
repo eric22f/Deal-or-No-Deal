@@ -137,6 +137,14 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
       setCasesOpenedThisRound(newCasesOpened)
 
       if (newCasesOpened >= CASES_TO_OPEN_PER_ROUND[currentRound]) {
+        const unopenedCases = briefcases.filter(b => !b.isOpened && !b.isPlayerCase && b.amount !== null)
+        const unopenedCount = unopenedCases.length - 1
+        
+        if (unopenedCount === 1 && currentRound === CASES_TO_OPEN_PER_ROUND.length - 1) {
+          setGamePhase('FINAL_CHOICE')
+          return
+        }
+        
         setGamePhase('BANKER_THINKING')
         
         const thinkingSounds = ['thinking01.mp3', 'thinking02.mp3', 'thinking03.mp3']
@@ -311,22 +319,23 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
         .map(b => b.id)
       setCasesToRemove([...casesToRemove, ...openedCaseIds])
       
-      const nextRound = currentRound + 1
-      if (nextRound >= CASES_TO_OPEN_PER_ROUND.length) {
-        const unopenedCases = briefcases.filter(b => !b.isOpened && !b.isPlayerCase && b.amount !== null)
-        if (unopenedCases.length === 1) {
-          setGamePhase('FINAL_CHOICE')
-        } else {
+      const unopenedCases = briefcases.filter(b => !b.isOpened && !b.isPlayerCase && b.amount !== null)
+      
+      if (unopenedCases.length === 1) {
+        setGamePhase('FINAL_CHOICE')
+      } else {
+        const nextRound = currentRound + 1
+        if (nextRound >= CASES_TO_OPEN_PER_ROUND.length) {
           const playerCase = briefcases.find(b => b.isPlayerCase)
           const winnings = playerCase?.amount || 0
           setFinalWinnings(winnings)
           onGameEnd(winnings)
           setGamePhase('GAME_OVER')
+        } else {
+          setCurrentRound(nextRound)
+          setCasesOpenedThisRound(0)
+          setGamePhase('OPEN_CASES')
         }
-      } else {
-        setCurrentRound(nextRound)
-        setCasesOpenedThisRound(0)
-        setGamePhase('OPEN_CASES')
       }
     }
   }
@@ -379,7 +388,7 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
     } else if (gamePhase === 'BANKER_OFFER') {
       return bankerRemark
     } else if (gamePhase === 'FINAL_CHOICE') {
-      return 'Choose your final briefcase!'
+      return 'Keep your briefcase, or go with the remaining case?'
     } else if (gamePhase === 'GAME_OVER') {
       if (tookDeal) {
         return `You Win ₱ ${bankerOffer.toLocaleString('en-PH')}`
