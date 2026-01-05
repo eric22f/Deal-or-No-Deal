@@ -30,7 +30,9 @@ export const calculateBankerOffer = (briefcases: Briefcase[]): number => {
     }
     
     return Math.max(sortedAmounts[0] + 1, Math.min(sortedAmounts[1] - 1, offer))
-  } else if (sortedAmounts.length <= 4) {
+  } else if (sortedAmounts.length === 4) {
+    baseValue = (sortedAmounts[1] + sortedAmounts[2]) / 2
+  } else if (sortedAmounts.length === 3) {
     baseValue = sortedAmounts[sortedAmounts.length - 2]
   } else {
     const middleIndex = Math.floor(sortedAmounts.length / 2)
