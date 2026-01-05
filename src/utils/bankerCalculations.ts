@@ -19,7 +19,16 @@ export const calculateBankerOffer = (briefcases: Briefcase[]): number => {
     const difference = sortedAmounts[1] - sortedAmounts[0]
     const variance = (difference > 900) ? 150 : (difference > 450) ? 75 : 50
     const randomVariance = (Math.random() * 2 - 1) * variance
-    const offer = Math.round(baseValue + randomVariance)
+    let offer = baseValue + randomVariance
+    
+    if (offer < 10) {
+      offer = Math.ceil(offer)
+    } else if (offer < 100) {
+      offer = Math.ceil(offer / 5) * 5
+    } else {
+      offer = Math.ceil(offer / 50) * 50
+    }
+    
     return Math.max(sortedAmounts[0] + 1, Math.min(sortedAmounts[1] - 1, offer))
   } else if (sortedAmounts.length <= 4) {
     baseValue = sortedAmounts[sortedAmounts.length - 2]
