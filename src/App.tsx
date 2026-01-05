@@ -14,6 +14,7 @@ function App() {
   const [nameError, setNameError] = useState('')
   const [isGameActive, setIsGameActive] = useState(false)
   const [currentPlayer, setCurrentPlayer] = useState('')
+  const [showFullLeaderboard, setShowFullLeaderboard] = useState(false)
 
   useEffect(() => {
     const playAudio = async () => {
@@ -128,6 +129,31 @@ function App() {
               Start New Game
             </button>
           </div>
+          {playerScores.length > 0 && (
+            <div className="home-leaderboard">
+              <h3 className="home-leaderboard-title">Leaderboard</h3>
+              <div className={`home-leaderboard-list ${showFullLeaderboard ? 'expanded' : ''}`}>
+                {[...playerScores]
+                  .sort((a, b) => b.winnings - a.winnings)
+                  .slice(0, showFullLeaderboard ? playerScores.length : 3)
+                  .map((player, index) => (
+                    <div key={index} className="home-leaderboard-item">
+                      <span className="home-leaderboard-rank">{index + 1}.</span>
+                      <span className="home-leaderboard-name">{player.name}</span>
+                      <span className="home-leaderboard-winnings">₱{player.winnings.toLocaleString('en-PH')}</span>
+                    </div>
+                  ))}
+              </div>
+              {playerScores.length > 3 && (
+                <button 
+                  className="home-leaderboard-toggle"
+                  onClick={() => setShowFullLeaderboard(!showFullLeaderboard)}
+                >
+                  {showFullLeaderboard ? 'Show Less' : `Show All (${playerScores.length})`}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
       <audio ref={audioRef} loop>

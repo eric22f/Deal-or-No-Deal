@@ -203,17 +203,17 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
     
     const remarks = {
       terrible: [
-        "Is that a joke? My piggy bank has more than that!",
+        "Is that a joke? This has to be a mistake!",
         "The banker must be laughing all the way to the bank with that offer!",
         "That's not an offer, that's an insult wrapped in pesos!",
-        "I've seen better offers at a garage sale!",
-        "The banker thinks you were born yesterday with that lowball!"
+        "Is the banker even awake??",
+        "The banker thinks you were born yesterday!"
       ],
       poor: [
         "Hmm, the banker is being a bit stingy today...",
-        "That's barely enough for a nice dinner, let alone life-changing money!",
+        "That's barely enough for a meal, let alone life-changing money!",
         "The banker is clearly hoping you'll panic!",
-        "You could probably find more money in your couch cushions!",
+        "Who is the banker anyway??!",
         "That offer is weaker than my morning coffee!"
       ],
       fair: [
@@ -233,7 +233,7 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
       excellent: [
         "JACKPOT ALERT! The banker is in full panic mode!",
         "That's an INSANE offer! The banker knows you've got the goods!",
-        "The banker just threw the kitchen sink at you!",
+        "The banker is about to go broke!",
         "I can hear the banker crying from here with that offer!",
         "That's 'retire early' money right there! The banker is DESPERATE!"
       ]
