@@ -395,6 +395,43 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
   }
 
   const handleRevealBriefcase = () => {
+    const playerCase = briefcases.find(b => b.isPlayerCase)
+    const briefcaseAmount = playerCase?.amount || 0
+    const difference = Math.abs(briefcaseAmount - bankerOffer)
+    
+    let soundFile = ''
+    
+    if (briefcaseAmount > bankerOffer) {
+      // Player's briefcase had more - they made a bad deal (aww sounds)
+      if (difference <= 200) {
+        soundFile = '/aww/aww01.mp3'
+      } else if (difference <= 1000) {
+        soundFile = '/aww/aww02.mp3'
+      } else {
+        soundFile = '/aww/aww03.mp3'
+      }
+    } else {
+      // Player's briefcase had less - they made a good deal (cheer sounds)
+      if (difference <= 100) {
+        soundFile = '/cheer/cheer01.mp3'
+      } else if (difference <= 250) {
+        soundFile = '/cheer/cheer02.mp3'
+      } else if (difference <= 500) {
+        soundFile = '/cheer/cheer03.wav'
+      } else if (difference <= 1000) {
+        soundFile = '/cheer/cheer04.wav'
+      } else {
+        soundFile = '/cheer/cheer05.wav'
+      }
+    }
+    
+    if (soundFile) {
+      setTimeout(() => {
+        const audio = new Audio(soundFile)
+        audio.play().catch(err => console.log('Could not play sound:', err))
+      }, 100)
+    }
+    
     setBriefcaseRevealed(true)
   }
 

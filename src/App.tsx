@@ -108,7 +108,7 @@ function App() {
               className="player-name-input" 
               placeholder="Player Name..."
               value={playerName}
-              maxLength={20}
+              maxLength={18}
               onChange={(e) => {
                 setPlayerName(e.target.value)
                 setNameError('')
