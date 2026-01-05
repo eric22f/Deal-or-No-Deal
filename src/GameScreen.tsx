@@ -12,7 +12,7 @@ const LEFT_COLUMN_VALUES = [0.05, 1, 5, 10, 20, 50, 100, 125, 150, 200, 250]
 const RIGHT_COLUMN_VALUES = [300, 350, 400, 450, 500, 600, 700, 800, 1000, 2500, 5000]
 const ALL_VALUES = [...LEFT_COLUMN_VALUES, ...RIGHT_COLUMN_VALUES]
 
-type GamePhase = 'SELECT_YOUR_CASE' | 'OPEN_CASES' | 'BANKER_THINKING' | 'BANKER_CALLING' | 'BANKER_OFFER' | 'GAME_OVER'
+type GamePhase = 'SELECT_YOUR_CASE' | 'OPEN_CASES' | 'BANKER_THINKING' | 'BANKER_CALLING' | 'BANKER_OFFER' | 'FINAL_CHOICE' | 'GAME_OVER'
 
 interface Briefcase {
   id: number
@@ -313,17 +313,53 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
       
       const nextRound = currentRound + 1
       if (nextRound >= CASES_TO_OPEN_PER_ROUND.length) {
-        const playerCase = briefcases.find(b => b.isPlayerCase)
-        const winnings = playerCase?.amount || 0
-        setFinalWinnings(winnings)
-        onGameEnd(winnings)
-        setGamePhase('GAME_OVER')
+        const unopenedCases = briefcases.filter(b => !b.isOpened && !b.isPlayerCase && b.amount !== null)
+        if (unopenedCases.length === 1) {
+          setGamePhase('FINAL_CHOICE')
+        } else {
+          const playerCase = briefcases.find(b => b.isPlayerCase)
+          const winnings = playerCase?.amount || 0
+          setFinalWinnings(winnings)
+          onGameEnd(winnings)
+          setGamePhase('GAME_OVER')
+        }
       } else {
         setCurrentRound(nextRound)
         setCasesOpenedThisRound(0)
         setGamePhase('OPEN_CASES')
       }
     }
+  }
+
+  const handleFinalChoice = (choosePlayerCase: boolean) => {
+    const playerCase = briefcases.find(b => b.isPlayerCase)
+    const lastCase = briefcases.find(b => !b.isOpened && !b.isPlayerCase && b.amount !== null)
+    
+    if (!playerCase || !lastCase) return
+    
+    const chosenAmount = choosePlayerCase ? playerCase.amount : lastCase.amount
+    const otherAmount = choosePlayerCase ? lastCase.amount : playerCase.amount
+    
+    setFinalWinnings(chosenAmount || 0)
+    
+    let soundFile = ''
+    if (chosenAmount !== null && chosenAmount < 50) {
+      soundFile = '/laugh/laugh01.mp3'
+    } else if (chosenAmount !== null && otherAmount !== null) {
+      if (chosenAmount > otherAmount) {
+        soundFile = '/cheer/cheer05.mp3'
+      } else {
+        soundFile = '/aww/aww03.mp3'
+      }
+    }
+    
+    if (soundFile) {
+      const audio = new Audio(soundFile)
+      audio.play().catch(err => console.log('Could not play sound:', err))
+    }
+    
+    onGameEnd(chosenAmount || 0)
+    setGamePhase('GAME_OVER')
   }
 
   const handleRevealBriefcase = () => {
@@ -342,6 +378,8 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
       return 'The Banker is calling...'
     } else if (gamePhase === 'BANKER_OFFER') {
       return bankerRemark
+    } else if (gamePhase === 'FINAL_CHOICE') {
+      return 'Choose your final briefcase!'
     } else if (gamePhase === 'GAME_OVER') {
       if (tookDeal) {
         return `You Win ₱ ${bankerOffer.toLocaleString('en-PH')}`
@@ -399,7 +437,10 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
         </div>
 
         {briefcases.find(b => b.isPlayerCase) && gamePhase !== 'GAME_OVER' && (
-          <div className="player-case-display">
+          <div 
+            className={`player-case-display ${gamePhase === 'FINAL_CHOICE' ? 'clickable' : ''}`}
+            onClick={() => gamePhase === 'FINAL_CHOICE' && handleFinalChoice(true)}
+          >
             <div className="player-case-label">Your Briefcase</div>
             <div className="player-case-container">
               <img 
@@ -509,6 +550,52 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
                       shouldRemove ? 'removed' : ''
                     }`}
                     onClick={() => handleCaseClick(briefcase.id)}
+                  >
+                    {briefcase.amount !== null && !briefcase.isOpened && !shouldRemove && (
+                      <img 
+                        src={`/briefcases/briefcase${String(briefcase.id).padStart(2, '0')}.png`}
+                        alt={`Case ${briefcase.id}`}
+                        className="briefcase-image"
+                      />
+                    )}
+                    {briefcase.isOpened && !briefcase.isPlayerCase && !shouldRemove && (
+                      <div className="opened-briefcase">
+                        <img 
+                          src="/briefcases/briefcase-open.png"
+                          alt="Opened Case"
+                          className="briefcase-open-image"
+                        />
+                        <div className="briefcase-amount">
+                          ₱ {briefcase.amount?.toLocaleString('en-PH')}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </>
+        ) : gamePhase === 'FINAL_CHOICE' ? (
+          <>
+            <div className="game-message">
+              {getMessage()}
+            </div>
+            <div className="briefcases-grid">
+              {briefcases.map((briefcase) => {
+                const shouldRemove = casesToRemove.includes(briefcase.id)
+                return (
+                  <div
+                    key={briefcase.id}
+                    className={`briefcase ${briefcase.amount === null ? 'empty' : ''} ${
+                      briefcase.isPlayerCase ? 'player-case' : ''
+                    } ${briefcase.isOpened && !shouldRemove ? 'opened' : ''} ${
+                      shouldRemove ? 'removed' : ''
+                    } ${!briefcase.isOpened && !briefcase.isPlayerCase && briefcase.amount !== null ? 'clickable' : ''}`}
+                    onClick={() => {
+                      if (!briefcase.isOpened && !briefcase.isPlayerCase && briefcase.amount !== null) {
+                        handleFinalChoice(false)
+                      }
+                    }}
                   >
                     {briefcase.amount !== null && !briefcase.isOpened && !shouldRemove && (
                       <img 

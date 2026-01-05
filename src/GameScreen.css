@@ -274,11 +274,40 @@
 .briefcase {
   position: relative;
   aspect-ratio: 1;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
   transition: transform 0.2s;
+}
+
+.briefcase.clickable {
+  cursor: pointer;
+  animation: highlight-pulse 2s ease-in-out infinite;
+}
+
+@keyframes highlight-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.05);
+    filter: brightness(1.2);
+  }
+}
+
+.player-case-display.clickable {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.player-case-display.clickable:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 12px rgba(212, 175, 55, 0.5);
+}
+
+.briefcase {
   width: 100%;
   max-width: 120px;
   justify-self: center;
@@ -473,7 +502,7 @@
 }
 
 .answer-button {
-  padding: 12px 40px;
+  padding: 8px 40px;
   font-size: 18px;
   font-weight: bold;
   color: #fff;
@@ -486,7 +515,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
   transition: transform 0.2s, box-shadow 0.2s;
   animation: pulse 1.5s ease-in-out infinite;
-  margin-left: 20px;
+  margin: -10px 20px -10px 0;
 }
 
 @keyframes pulse {
