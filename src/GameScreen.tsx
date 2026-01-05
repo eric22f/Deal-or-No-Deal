@@ -1,27 +1,24 @@
 import { useState, useEffect } from 'react'
 import './GameScreen.css'
+import type { GamePhase, Briefcase, PlayerScore } from './types/game'
+import { 
+  ALL_VALUES, 
+  LEFT_COLUMN_VALUES, 
+  RIGHT_COLUMN_VALUES,
+  CASES_TO_OPEN_PER_ROUND,
+  BANKER_THINKING_DELAYS,
+  PHONE_RING_INTERVAL,
+  THINKING_SOUNDS
+} from './constants/gameConfig'
+import { calculateBankerOffer, getBankerRemark } from './utils/bankerCalculations'
+import { playCaseOpenSound, playDealAcceptedSound, playBriefcaseRevealSound } from './utils/soundEffects'
 
 interface GameScreenProps {
   playerName: string
   onReset: () => void
   onGameEnd: (winnings: number) => void
-  playerScores: { name: string; winnings: number }[]
+  playerScores: PlayerScore[]
 }
-
-const LEFT_COLUMN_VALUES = [0.05, 1, 5, 10, 20, 50, 100, 125, 150, 200, 250]
-const RIGHT_COLUMN_VALUES = [300, 350, 400, 450, 500, 600, 700, 800, 1000, 2500, 5000]
-const ALL_VALUES = [...LEFT_COLUMN_VALUES, ...RIGHT_COLUMN_VALUES]
-
-type GamePhase = 'SELECT_YOUR_CASE' | 'OPEN_CASES' | 'BANKER_THINKING' | 'BANKER_CALLING' | 'BANKER_OFFER' | 'FINAL_CHOICE' | 'GAME_OVER'
-
-interface Briefcase {
-  id: number
-  amount: number | null
-  isPlayerCase: boolean
-  isOpened: boolean
-}
-
-const CASES_TO_OPEN_PER_ROUND = [6, 5, 4, 3, 2, 1]
 
 function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreenProps) {
   const [briefcases, setBriefcases] = useState<Briefcase[]>([])
@@ -66,53 +63,6 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
     setOpenedAmounts([])
   }
 
-  const playSoundEffect = (openedAmount: number) => {
-    const unopenedCases = briefcases.filter(b => !b.isOpened && b.amount !== null && !b.isPlayerCase)
-    const unopenedAmounts = unopenedCases.map(b => b.amount as number).sort((a, b) => a - b)
-    
-    const minValue = Math.min(...unopenedAmounts)
-    const maxValue = Math.max(...unopenedAmounts)
-    
-    let soundFile = ''
-    
-    if (openedAmount === minValue) {
-      soundFile = '/cheer/cheer05.wav'
-    } else if (openedAmount === maxValue) {
-      soundFile = '/aww/aww03.mp3'
-    } else {
-      const sortedAmounts = [...unopenedAmounts].sort((a, b) => a - b)
-      const middleIndex = Math.floor(sortedAmounts.length / 2)
-      const median = sortedAmounts.length % 2 === 0
-        ? (sortedAmounts[middleIndex - 1] + sortedAmounts[middleIndex]) / 2
-        : sortedAmounts[middleIndex]
-      
-      const position = sortedAmounts.indexOf(openedAmount)
-      const percentile = position / sortedAmounts.length
-      
-      if (openedAmount < median) {
-        if (percentile <= 0.1) {
-          soundFile = '/cheer/cheer04.wav'
-        } else if (percentile <= 0.3) {
-          soundFile = '/cheer/cheer03.wav'
-        } else if (percentile <= 0.5) {
-          soundFile = '/cheer/cheer02.mp3'
-        } else {
-          soundFile = '/cheer/cheer01.mp3'
-        }
-      } else {
-        if (percentile >= 0.5) {
-          soundFile = '/aww/aww02.mp3'
-        } else {
-          soundFile = '/aww/aww01.mp3'
-        }
-      }
-    }
-    
-    if (soundFile) {
-      const audio = new Audio(soundFile)
-      audio.play().catch(err => console.log('Could not play sound:', err))
-    }
-  }
 
   const handleCaseClick = (caseId: number) => {
     const clickedCase = briefcases.find(c => c.id === caseId)
@@ -128,7 +78,7 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
       
       if (casesOpenedThisRound >= CASES_TO_OPEN_PER_ROUND[currentRound]) return
 
-      playSoundEffect(clickedCase.amount)
+      playCaseOpenSound(clickedCase.amount, briefcases)
 
       setBriefcases(briefcases.map(c => 
         c.id === caseId ? { ...c, isOpened: true } : c
@@ -149,27 +99,18 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
         
         setGamePhase('BANKER_THINKING')
         
-        const thinkingSounds = ['thinking01.mp3', 'thinking02.mp3', 'thinking03.mp3']
-        const randomSound = thinkingSounds[Math.floor(Math.random() * thinkingSounds.length)]
+        const randomSound = THINKING_SOUNDS[Math.floor(Math.random() * THINKING_SOUNDS.length)]
         const thinkAudio = new Audio(`/thinking/${randomSound}`)
         thinkAudio.loop = true
         thinkAudio.play().catch(err => console.log('Could not play thinking sound:', err))
         setThinkingAudio(thinkAudio)
         
-        let minDelay, maxDelay
-        if (currentRound === 0) {
-          minDelay = 10000
-          maxDelay = 20000
-        } else if (currentRound === 1) {
-          minDelay = 7500
-          maxDelay = 15000
-        } else if (currentRound === 2) {
-          minDelay = 5000
-          maxDelay = 15000
-        } else {
-          minDelay = 2500
-          maxDelay = 12500
-        }
+        const delayConfig = currentRound === 0 ? BANKER_THINKING_DELAYS.round0
+          : currentRound === 1 ? BANKER_THINKING_DELAYS.round1
+          : currentRound === 2 ? BANKER_THINKING_DELAYS.round2
+          : BANKER_THINKING_DELAYS.default
+        
+        const { min: minDelay, max: maxDelay } = delayConfig
         
         const delay = Math.random() * (maxDelay - minDelay) + minDelay
         
@@ -187,74 +128,13 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
           }
           
           playPhoneRing()
-          const intervalId = window.setInterval(playPhoneRing, 5000)
+          const intervalId = window.setInterval(playPhoneRing, PHONE_RING_INTERVAL)
           setPhoneIntervalId(intervalId)
         }, delay)
       }
     }
   }
 
-  const getBankerRemark = (offer: number): string => {
-    const unopenedCases = briefcases.filter(b => !b.isOpened && b.amount !== null && !b.isPlayerCase)
-    const unopenedAmounts = unopenedCases.map(b => b.amount as number)
-    const avgRemaining = unopenedAmounts.reduce((a, b) => a + b, 0) / unopenedAmounts.length
-    
-    const offerQuality = offer / avgRemaining
-    
-    const remarks = {
-      terrible: [
-        "Is that a joke? This has to be a mistake!",
-        "The banker must be laughing all the way to the bank with that offer!",
-        "That's not an offer, that's an insult wrapped in pesos!",
-        "Is the banker even awake??",
-        "The banker thinks you were born yesterday!"
-      ],
-      poor: [
-        "Hmm, the banker is being a bit stingy today...",
-        "That's barely enough for a meal, let alone life-changing money!",
-        "The banker is clearly hoping you'll panic!",
-        "Who is the banker anyway??!",
-        "That offer is weaker than my morning coffee!"
-      ],
-      fair: [
-        "Now we're talking! A respectable offer on the table.",
-        "The banker is playing it safe with this one.",
-        "Not bad, not bad at all... but is it enough?",
-        "A solid offer, but there could be more in your case!",
-        "The banker is being reasonable... suspiciously reasonable!"
-      ],
-      good: [
-        "WOW! The banker is getting nervous!",
-        "That's a serious offer! Someone's sweating in that bank!",
-        "The banker must really want you to take this deal!",
-        "Now THAT'S what I call an offer! The banker sees something!",
-        "Holy pesos! The banker is practically begging you to stop!"
-      ],
-      excellent: [
-        "JACKPOT ALERT! The banker is in full panic mode!",
-        "That's an INSANE offer! The banker knows you've got the goods!",
-        "The banker is about to go broke!",
-        "I can hear the banker crying from here with that offer!",
-        "That's 'retire early' money right there! The banker is DESPERATE!"
-      ]
-    }
-    
-    let remarkCategory: keyof typeof remarks
-    if (offerQuality < 0.3) {
-      remarkCategory = 'terrible'
-    } else if (offerQuality < 0.6) {
-      remarkCategory = 'poor'
-    } else if (offerQuality < 0.9) {
-      remarkCategory = 'fair'
-    } else if (offerQuality < 1.2) {
-      remarkCategory = 'good'
-    } else {
-      remarkCategory = 'excellent'
-    }
-    
-    const categoryRemarks = remarks[remarkCategory]
-    return categoryRemarks[Math.floor(Math.random() * categoryRemarks.length)]
-  }
 
   const handleAnswerCall = () => {
     if (phoneIntervalId !== null) {
@@ -268,97 +148,22 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
       setThinkingAudio(null)
     }
     
-    const offer = calculateBankerOffer()
+    const offer = calculateBankerOffer(briefcases)
     setBankerOffer(offer)
-    const remark = getBankerRemark(offer)
+    const remark = getBankerRemark(offer, briefcases)
     setBankerRemark(remark)
     setGamePhase('BANKER_OFFER')
   }
 
-  const calculateBankerOffer = (): number => {
-    const unopenedCases = briefcases.filter(b => !b.isOpened && b.amount !== null)
-    const playerCase = briefcases.find(b => b.isPlayerCase)
-    
-    // Include player's case amount in calculations
-    const allRemainingAmounts = [...unopenedCases.map(b => b.amount as number)]
-    if (playerCase && playerCase.amount !== null) {
-      allRemainingAmounts.push(playerCase.amount)
-    }
-    
-    const sortedAmounts = [...allRemainingAmounts].sort((a, b) => a - b)
-    
-    let baseValue: number
-    
-    if (sortedAmounts.length === 2) {
-      // Use average of the two remaining values
-      baseValue = (sortedAmounts[0] + sortedAmounts[1]) / 2
-    } else if (sortedAmounts.length <= 4) {
-      // Use 2nd-highest value (second from the end)
-      baseValue = sortedAmounts[sortedAmounts.length - 2]
-    } else {
-      // Use median for 5 or more items
-      const middleIndex = Math.floor(sortedAmounts.length / 2)
-      baseValue = sortedAmounts.length % 2 === 0
-        ? (sortedAmounts[middleIndex - 1] + sortedAmounts[middleIndex]) / 2
-        : sortedAmounts[middleIndex]
-    }
-    
-    let variancePercent: number
-    if (baseValue < 500) {
-      variancePercent = 0.15
-    } else if (baseValue < 1000) {
-      variancePercent = 0.10
-    } else {
-      variancePercent = 0.05
-    }
-    
-    const randomVariance = (Math.random() * 2 - 1) * variancePercent
-    let offer = baseValue * (1 + randomVariance)
-    
-    if (offer < 10) {
-      offer = Math.ceil(offer)
-    } else if (offer < 100) {
-      offer = Math.ceil(offer / 5) * 5
-    } else {
-      offer = Math.ceil(offer / 50) * 50
-    }
-    
-    // Ensure offer is strictly between min and max values
-    const minValue = sortedAmounts[0]
-    const maxValue = sortedAmounts[sortedAmounts.length - 1]
-    
-    if (offer <= minValue) {
-      offer = minValue + (minValue < 10 ? 1 : minValue < 100 ? 5 : 50)
-    } else if (offer >= maxValue) {
-      offer = maxValue - (maxValue < 10 ? 1 : maxValue < 100 ? 5 : 50)
-    }
-    
-    return offer
-  }
 
   const handleDealOrNoDeal = (isDeal: boolean) => {
     if (isDeal) {
       const playerCase = briefcases.find(b => b.isPlayerCase)
-      setFinalWinnings(playerCase?.amount || 0)
+      const playerAmount = playerCase?.amount || 0
+      setFinalWinnings(playerAmount)
       setTookDeal(true)
       
-      let soundFile = ''
-      if (bankerOffer <= 50) {
-        soundFile = '/laugh01.mp3'
-      } else if (playerCase && playerCase.amount !== null) {
-        if (bankerOffer > playerCase.amount) {
-          soundFile = '/cheer/cheer05.wav'
-        } else {
-          soundFile = '/aww/aww03.mp3'
-        }
-      }
-      
-      if (soundFile) {
-        setTimeout(() => {
-          const audio = new Audio(soundFile)
-          audio.play().catch(err => console.log('Could not play sound:', err))
-        }, 100)
-      }
+      playDealAcceptedSound(bankerOffer, playerAmount)
       
       onGameEnd(bankerOffer)
       setGamePhase('GAME_OVER')
@@ -425,41 +230,8 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
   const handleRevealBriefcase = () => {
     const playerCase = briefcases.find(b => b.isPlayerCase)
     const briefcaseAmount = playerCase?.amount || 0
-    const difference = Math.abs(briefcaseAmount - bankerOffer)
     
-    let soundFile = ''
-    
-    if (briefcaseAmount > bankerOffer) {
-      // Player's briefcase had more - they made a bad deal (aww sounds)
-      if (difference <= 200) {
-        soundFile = '/aww/aww01.mp3'
-      } else if (difference <= 1000) {
-        soundFile = '/aww/aww02.mp3'
-      } else {
-        soundFile = '/aww/aww03.mp3'
-      }
-    } else {
-      // Player's briefcase had less - they made a good deal (cheer sounds)
-      if (difference <= 100) {
-        soundFile = '/cheer/cheer01.mp3'
-      } else if (difference <= 250) {
-        soundFile = '/cheer/cheer02.mp3'
-      } else if (difference <= 500) {
-        soundFile = '/cheer/cheer03.wav'
-      } else if (difference <= 1000) {
-        soundFile = '/cheer/cheer04.wav'
-      } else {
-        soundFile = '/cheer/cheer05.wav'
-      }
-    }
-    
-    if (soundFile) {
-      setTimeout(() => {
-        const audio = new Audio(soundFile)
-        audio.play().catch(err => console.log('Could not play sound:', err))
-      }, 100)
-    }
-    
+    playBriefcaseRevealSound(bankerOffer, briefcaseAmount)
     setBriefcaseRevealed(true)
   }
 
