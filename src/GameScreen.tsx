@@ -125,6 +125,8 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
       setGamePhase('OPEN_CASES')
     } else if (gamePhase === 'OPEN_CASES') {
       if (clickedCase.isPlayerCase || clickedCase.isOpened) return
+      
+      if (casesOpenedThisRound >= CASES_TO_OPEN_PER_ROUND[currentRound]) return
 
       playSoundEffect(clickedCase.amount)
 
@@ -390,7 +392,7 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
     } else if (gamePhase === 'BANKER_OFFER') {
       return bankerRemark
     } else if (gamePhase === 'FINAL_CHOICE') {
-      return 'Keep your briefcase, or go with the remaining case?'
+      return 'Choose your briefcase or swap for the remaining case?'
     } else if (gamePhase === 'GAME_OVER') {
       if (tookDeal) {
         return `You Win ₱ ${bankerOffer.toLocaleString('en-PH')}`
