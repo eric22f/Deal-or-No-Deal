@@ -205,21 +205,23 @@
 .game-message-with-button {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 20px;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   border: 2px solid #d4af37;
   border-radius: 8px;
   margin-bottom: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  position: relative;
 }
 
 .game-message-text {
   font-size: 24px;
   color: #d4af37;
   font-weight: bold;
-  flex: 1;
   text-align: center;
+  width: 100%;
 }
 
 .thinking-dots {
@@ -406,8 +408,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 20px;
+  justify-content: flex-start;
+  padding: 0;
   overflow-y: auto;
 }
 
@@ -515,7 +517,8 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
   transition: transform 0.2s, box-shadow 0.2s;
   animation: pulse 1.5s ease-in-out infinite;
-  margin: -10px 20px -10px 0;
+  position: absolute;
+  right: 20px;
 }
 
 @keyframes pulse {

@@ -519,9 +519,18 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
       </div>
 
       <div className="right-panel">
-        {gamePhase !== 'BANKER_THINKING' && gamePhase !== 'BANKER_CALLING' && gamePhase !== 'FINAL_CHOICE' && (
+        {gamePhase !== 'BANKER_THINKING' && gamePhase !== 'BANKER_CALLING' && gamePhase !== 'FINAL_CHOICE' && gamePhase !== 'GAME_OVER' && (
           <div className="game-message">
             {getMessage()}
+          </div>
+        )}
+
+        {gamePhase === 'GAME_OVER' && (!tookDeal || briefcaseRevealed) && (
+          <div className="game-message-with-button">
+            <div className="game-message-text">{getMessage()}</div>
+            <button className="answer-button" onClick={onReset}>
+              Next
+            </button>
           </div>
         )}
 
@@ -581,12 +590,6 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
                 })()}
               </div>
             </div>
-
-            {(!tookDeal || briefcaseRevealed) && (
-              <button className="next-button" onClick={onReset}>
-                Next
-              </button>
-            )}
           </div>
         ) : gamePhase === 'BANKER_THINKING' || gamePhase === 'BANKER_CALLING' ? (
           <>
