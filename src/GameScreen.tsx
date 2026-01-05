@@ -55,6 +55,15 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
     }
   }, [isEditingName])
 
+  useEffect(() => {
+    if (state.gamePhase === 'FINAL_CHOICE') {
+      const finalChoiceAudio = new Audio('/offer/offer03.mp3')
+      finalChoiceAudio.loop = true
+      offerAudioRef.current = finalChoiceAudio
+      finalChoiceAudio.play().catch(err => console.log('Could not play final choice audio:', err))
+    }
+  }, [state.gamePhase])
+
   const handleNameClick = () => {
     if (state.gamePhase !== 'GAME_OVER') {
       setIsEditingName(true)
@@ -216,6 +225,11 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
   }
 
   const handleFinalChoice = (choosePlayerCase: boolean) => {
+    if (offerAudioRef.current) {
+      offerAudioRef.current.pause()
+      offerAudioRef.current = null
+    }
+    
     const playerCase = getPlayerCase(state.briefcases)
     const lastCase = state.briefcases.find(b => !b.isOpened && !b.isPlayerCase && b.amount !== null)
     
