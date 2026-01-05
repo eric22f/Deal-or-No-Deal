@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import './GameScreen.css'
 import './styles/animations.css'
 import type { PlayerScore } from './types/game'
@@ -31,16 +31,87 @@ interface GameScreenProps {
   playerName: string
   onReset: () => void
   onGameEnd: (winnings: number) => void
+  onNameChange: (newName: string) => void
   playerScores: PlayerScore[]
 }
 
-function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreenProps) {
+function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores }: GameScreenProps) {
   const [state, dispatch] = useGameState()
   const audio = useAudioManager()
+  const [isEditingName, setIsEditingName] = useState(false)
+  const [editedName, setEditedName] = useState(playerName)
+  const [nameError, setNameError] = useState('')
+  const nameInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     dispatch({ type: 'INITIALIZE_GAME' })
   }, [dispatch])
+
+  useEffect(() => {
+    if (isEditingName && nameInputRef.current) {
+      nameInputRef.current.focus()
+      nameInputRef.current.select()
+    }
+  }, [isEditingName])
+
+  const handleNameClick = () => {
+    if (state.gamePhase !== 'GAME_OVER') {
+      setIsEditingName(true)
+      setEditedName(playerName)
+      setNameError('')
+    }
+  }
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditedName(e.target.value)
+    setNameError('')
+  }
+
+  const handleNameSubmit = () => {
+    const trimmedName = editedName.trim()
+    
+    if (!trimmedName) {
+      setNameError('Name cannot be empty')
+      return
+    }
+
+    if (trimmedName.length > 18) {
+      setNameError('Name too long (max 18 characters)')
+      return
+    }
+
+    const isDuplicate = playerScores.some(
+      player => player.name.toLowerCase() === trimmedName.toLowerCase() && player.name !== playerName
+    )
+
+    if (isDuplicate) {
+      setNameError('Name already used')
+      return
+    }
+
+    onNameChange(trimmedName)
+    setIsEditingName(false)
+    setNameError('')
+  }
+
+  const handleNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleNameSubmit()
+    } else if (e.key === 'Escape') {
+      setIsEditingName(false)
+      setEditedName(playerName)
+      setNameError('')
+    }
+  }
+
+  const handleNameBlur = () => {
+    if (editedName.trim() === playerName) {
+      setIsEditingName(false)
+      setNameError('')
+    } else {
+      handleNameSubmit()
+    }
+  }
 
   const handleCaseClick = (caseId: number) => {
     const clickedCase = state.briefcases.find(c => c.id === caseId)
@@ -174,7 +245,28 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
     <div className="game-screen">
       <div className="left-panel">
         <div className="player-info">
-          <div className="player-name">{playerName}</div>
+          {isEditingName ? (
+            <div className="player-name-edit-container">
+              <input
+                ref={nameInputRef}
+                type="text"
+                className="player-name-input"
+                value={editedName}
+                maxLength={18}
+                onChange={handleNameChange}
+                onKeyDown={handleNameKeyDown}
+                onBlur={handleNameBlur}
+              />
+              {nameError && <div className="name-error">{nameError}</div>}
+            </div>
+          ) : (
+            <div 
+              className={`player-name ${state.gamePhase !== 'GAME_OVER' ? 'editable' : ''}`}
+              onClick={handleNameClick}
+            >
+              {playerName}
+            </div>
+          )}
         </div>
         
         <div className="logo-container">

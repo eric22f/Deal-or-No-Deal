@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
-import GameScreen from './GameScreen'
+import GameScreen from './GameScreen.tsx'
 
 interface PlayerScore {
   name: string
@@ -72,6 +72,10 @@ function App() {
     setPlayerScores([...playerScores, { name: currentPlayer, winnings }])
   }
 
+  const handleNameChange = (newName: string) => {
+    setCurrentPlayer(newName)
+  }
+
   const handleReset = async () => {
     setIsGameActive(false)
     setCurrentPlayer('')
@@ -94,6 +98,7 @@ function App() {
           playerName={currentPlayer} 
           onReset={handleReset}
           onGameEnd={handleGameEnd}
+          onNameChange={handleNameChange}
           playerScores={playerScores}
         />
       ) : (
