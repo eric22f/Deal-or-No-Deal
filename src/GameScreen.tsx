@@ -41,6 +41,7 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
   const [isEditingName, setIsEditingName] = useState(false)
   const [editedName, setEditedName] = useState(playerName)
   const [nameError, setNameError] = useState('')
+  const [buttonsDisabled, setButtonsDisabled] = useState(false)
   const nameInputRef = useRef<HTMLInputElement>(null)
   const offerAudioRef = useRef<HTMLAudioElement | null>(null)
 
@@ -171,10 +172,15 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
 
   const handleAnswerCall = () => {
     audio.stopAllSounds()
+    setButtonsDisabled(true)
     
     const offer = calculateBankerOffer(state.briefcases)
     const remark = getBankerRemark(offer, state.briefcases)
     dispatch({ type: 'SET_BANKER_OFFER', offer, remark })
+    
+    setTimeout(() => {
+      setButtonsDisabled(false)
+    }, 3000)
     
     setTimeout(() => {
       const randomDealOrNo = Math.floor(Math.random() * 3) + 1
@@ -379,10 +385,10 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
                 <div className="offer-title">Banker's Offer</div>
                 <div className="offer-amount">₱ {state.bankerOffer.toLocaleString('en-PH')}</div>
                 <div className="offer-buttons">
-                  <button className="deal-button" onClick={() => handleDealOrNoDeal(true)}>
+                  <button className="deal-button" onClick={() => handleDealOrNoDeal(true)} disabled={buttonsDisabled}>
                     DEAL
                   </button>
-                  <button className="no-deal-button" onClick={() => handleDealOrNoDeal(false)}>
+                  <button className="no-deal-button" onClick={() => handleDealOrNoDeal(false)} disabled={buttonsDisabled}>
                     NO DEAL
                   </button>
                 </div>
