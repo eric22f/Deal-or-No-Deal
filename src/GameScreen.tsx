@@ -277,25 +277,43 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
 
   const calculateBankerOffer = (): number => {
     const unopenedCases = briefcases.filter(b => !b.isOpened && b.amount !== null)
-    const unopenedAmounts = unopenedCases.map(b => b.amount as number)
+    const playerCase = briefcases.find(b => b.isPlayerCase)
     
-    const sortedAmounts = [...unopenedAmounts].sort((a, b) => a - b)
-    const middleIndex = Math.floor(sortedAmounts.length / 2)
-    const median = sortedAmounts.length % 2 === 0
-      ? (sortedAmounts[middleIndex - 1] + sortedAmounts[middleIndex]) / 2
-      : sortedAmounts[middleIndex]
+    // Include player's case amount in calculations
+    const allRemainingAmounts = [...unopenedCases.map(b => b.amount as number)]
+    if (playerCase && playerCase.amount !== null) {
+      allRemainingAmounts.push(playerCase.amount)
+    }
+    
+    const sortedAmounts = [...allRemainingAmounts].sort((a, b) => a - b)
+    
+    let baseValue: number
+    
+    if (sortedAmounts.length === 2) {
+      // Use average of the two remaining values
+      baseValue = (sortedAmounts[0] + sortedAmounts[1]) / 2
+    } else if (sortedAmounts.length <= 4) {
+      // Use 2nd-highest value (second from the end)
+      baseValue = sortedAmounts[sortedAmounts.length - 2]
+    } else {
+      // Use median for 5 or more items
+      const middleIndex = Math.floor(sortedAmounts.length / 2)
+      baseValue = sortedAmounts.length % 2 === 0
+        ? (sortedAmounts[middleIndex - 1] + sortedAmounts[middleIndex]) / 2
+        : sortedAmounts[middleIndex]
+    }
     
     let variancePercent: number
-    if (median < 500) {
+    if (baseValue < 500) {
       variancePercent = 0.15
-    } else if (median < 1000) {
+    } else if (baseValue < 1000) {
       variancePercent = 0.10
     } else {
       variancePercent = 0.05
     }
     
     const randomVariance = (Math.random() * 2 - 1) * variancePercent
-    let offer = median * (1 + randomVariance)
+    let offer = baseValue * (1 + randomVariance)
     
     if (offer < 10) {
       offer = Math.ceil(offer)
