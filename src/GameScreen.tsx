@@ -148,17 +148,17 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
         
         let minDelay, maxDelay
         if (currentRound === 0) {
-          minDelay = 20000
-          maxDelay = 40000
-        } else if (currentRound === 1) {
-          minDelay = 15000
-          maxDelay = 30000
-        } else if (currentRound === 2) {
           minDelay = 10000
-          maxDelay = 30000
-        } else {
+          maxDelay = 20000
+        } else if (currentRound === 1) {
+          minDelay = 7500
+          maxDelay = 15000
+        } else if (currentRound === 2) {
           minDelay = 5000
-          maxDelay = 25000
+          maxDelay = 15000
+        } else {
+          minDelay = 2500
+          maxDelay = 12500
         }
         
         const delay = Math.random() * (maxDelay - minDelay) + minDelay
@@ -177,7 +177,7 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
           }
           
           playPhoneRing()
-          const intervalId = window.setInterval(playPhoneRing, 1000)
+          const intervalId = window.setInterval(playPhoneRing, 5000)
           setPhoneIntervalId(intervalId)
         }, delay)
       }
@@ -337,7 +337,7 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
       const remaining = CASES_TO_OPEN_PER_ROUND[currentRound] - casesOpenedThisRound
       return `Open ${remaining} more case${remaining !== 1 ? 's' : ''}`
     } else if (gamePhase === 'BANKER_THINKING') {
-      return 'Banker is Thinking....'
+      return 'Banker is Thinking'
     } else if (gamePhase === 'BANKER_CALLING') {
       return 'The Banker is calling...'
     } else if (gamePhase === 'BANKER_OFFER') {
@@ -481,7 +481,16 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
         ) : gamePhase === 'BANKER_THINKING' || gamePhase === 'BANKER_CALLING' ? (
           <>
             <div className="game-message-with-button">
-              <div className="game-message-text">{getMessage()}</div>
+              <div className="game-message-text">
+                {getMessage()}
+                {gamePhase === 'BANKER_THINKING' && (
+                  <span className="thinking-dots">
+                    <span className="dot">.</span>
+                    <span className="dot">.</span>
+                    <span className="dot">.</span>
+                  </span>
+                )}
+              </div>
               {gamePhase === 'BANKER_CALLING' && (
                 <button className="answer-button" onClick={handleAnswerCall}>
                   Answer
