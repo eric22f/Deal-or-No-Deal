@@ -70,6 +70,13 @@ export const calculateBankerOffer = (briefcases: Briefcase[]): number => {
     offer = maxValue - (maxValue < 10 ? 1 : maxValue < 100 ? 5 : 50)
   }
   
+  // Re-round after boundary adjustments
+  if (offer >= 100) {
+    offer = Math.ceil(offer / 50) * 50
+  } else if (offer >= 10) {
+    offer = Math.ceil(offer / 5) * 5
+  }
+  
   return offer
 }
 
