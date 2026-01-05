@@ -416,7 +416,7 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
           </div>
         )}
 
-        {!(state.gamePhase === 'GAME_OVER' && state.tookDeal) && (
+        {state.gamePhase !== 'GAME_OVER' && (
           <div className={`briefcase-grid-container ${state.gamePhase === 'BANKER_OFFER' ? 'fade-out' : ''}`}>
             <BriefcaseGrid
               briefcases={state.briefcases}
