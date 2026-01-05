@@ -98,13 +98,13 @@ export const playBriefcaseRevealSound = (bankerOffer: number, briefcaseAmount: n
       soundFile = '/aww/aww03.mp3'
     }
   } else {
-    if (difference <= 100) {
+    if (difference < 100) {
       soundFile = '/cheer/cheer01.mp3'
-    } else if (difference <= 250) {
+    } else if (difference < 250) {
       soundFile = '/cheer/cheer02.mp3'
-    } else if (difference <= 500) {
+    } else if (difference < 500) {
       soundFile = '/cheer/cheer03.wav'
-    } else if (difference <= 1000) {
+    } else if (difference < 1000) {
       soundFile = '/cheer/cheer04.wav'
     } else {
       soundFile = '/cheer/cheer05.wav'

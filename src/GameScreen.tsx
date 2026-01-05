@@ -149,7 +149,9 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
   }
 
   const handleRevealBriefcase = () => {
-    playBriefcaseRevealSound(state.bankerOffer, state.finalWinnings)
+    const playerCase = getPlayerCase(state.briefcases)
+    const briefcaseAmount = playerCase?.amount || 0
+    playBriefcaseRevealSound(state.bankerOffer, briefcaseAmount)
     dispatch({ type: 'REVEAL_BRIEFCASE' })
   }
 
