@@ -164,10 +164,8 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
     state.bankerOffer
   )
 
-  // Include current player's score in leaderboard if game is over
-  const displayScores = state.gamePhase === 'GAME_OVER' 
-    ? [...playerScores, { name: playerName, winnings: state.finalWinnings }]
-    : playerScores
+  // Use playerScores directly - parent App already adds current player via onGameEnd
+  const displayScores = playerScores
 
   return (
     <div className="game-screen">
