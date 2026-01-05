@@ -101,7 +101,7 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
       const playerAmount = playerCase?.amount || 0
       
       playDealAcceptedSound(state.bankerOffer, playerAmount)
-      dispatch({ type: 'ACCEPT_DEAL', playerAmount })
+      dispatch({ type: 'ACCEPT_DEAL', bankerOffer: state.bankerOffer })
       onGameEnd(state.bankerOffer)
     } else {
       const openedCaseIds = getOpenedCaseIds(state.briefcases)

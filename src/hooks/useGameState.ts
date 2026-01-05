@@ -23,7 +23,7 @@ type GameAction =
   | { type: 'START_BANKER_THINKING' }
   | { type: 'START_BANKER_CALLING' }
   | { type: 'SET_BANKER_OFFER'; offer: number; remark: string }
-  | { type: 'ACCEPT_DEAL'; playerAmount: number }
+  | { type: 'ACCEPT_DEAL'; bankerOffer: number }
   | { type: 'REJECT_DEAL'; casesToRemove: number[] }
   | { type: 'START_NEXT_ROUND' }
   | { type: 'START_FINAL_CHOICE' }
@@ -114,7 +114,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     case 'ACCEPT_DEAL':
       return {
         ...state,
-        finalWinnings: action.playerAmount,
+        finalWinnings: action.bankerOffer,
         tookDeal: true,
         gamePhase: 'GAME_OVER'
       }
