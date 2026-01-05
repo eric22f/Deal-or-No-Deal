@@ -42,6 +42,7 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
   const [editedName, setEditedName] = useState(playerName)
   const [nameError, setNameError] = useState('')
   const nameInputRef = useRef<HTMLInputElement>(null)
+  const offerAudioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
     dispatch({ type: 'INITIALIZE_GAME' })
@@ -165,9 +166,34 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
     const offer = calculateBankerOffer(state.briefcases)
     const remark = getBankerRemark(offer, state.briefcases)
     dispatch({ type: 'SET_BANKER_OFFER', offer, remark })
+    
+    setTimeout(() => {
+      const randomDealOrNo = Math.floor(Math.random() * 3) + 1
+      const dealOrNoAudio = new Audio(`/deal/deal-or-no-0${randomDealOrNo}.mp3`)
+      dealOrNoAudio.play().catch(err => console.log('Could not play deal-or-no audio:', err))
+      
+      dealOrNoAudio.addEventListener('ended', () => {
+        let offerFile = 'offer03.mp3'
+        if (offer < 500) {
+          offerFile = 'offer01.mp3'
+        } else if (offer < 1000) {
+          offerFile = 'offer02.mp3'
+        }
+        
+        const offerAudio = new Audio(`/offer/${offerFile}`)
+        offerAudio.loop = true
+        offerAudioRef.current = offerAudio
+        offerAudio.play().catch(err => console.log('Could not play offer audio:', err))
+      })
+    }, 2500)
   }
 
   const handleDealOrNoDeal = (isDeal: boolean) => {
+    if (offerAudioRef.current) {
+      offerAudioRef.current.pause()
+      offerAudioRef.current = null
+    }
+    
     if (isDeal) {
       const playerCase = getPlayerCase(state.briefcases)
       const playerAmount = playerCase?.amount || 0

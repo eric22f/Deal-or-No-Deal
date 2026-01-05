@@ -64,6 +64,15 @@ function App() {
       audioRef.current.pause()
     }
     
+    const contestantIntro = new Audio('/contestant-intro.mp3')
+    contestantIntro.play().catch(err => console.log('Could not play contestant intro:', err))
+    
+    contestantIntro.addEventListener('ended', () => {
+      const randomPrompt = Math.floor(Math.random() * 4) + 1
+      const casePrompt = new Audio(`/pick/case-prompt-0${randomPrompt}.mp3`)
+      casePrompt.play().catch(err => console.log('Could not play case prompt:', err))
+    })
+    
     setCurrentPlayer(trimmedName)
     setIsGameActive(true)
   }
