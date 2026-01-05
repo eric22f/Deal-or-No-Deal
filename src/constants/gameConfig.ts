@@ -21,13 +21,13 @@ export const BANKER_REMARKS = {
     "The banker must be laughing all the way to the bank with that offer!",
     "That's not an offer, that's an insult wrapped in pesos!",
     "Is the banker even awake??",
-    "The banker thinks you were born yesterday!"
+    "The banker thinks you are not paying attention!"
   ],
   poor: [
     "Hmm, the banker is being a bit stingy today...",
-    "That's barely enough for a meal, let alone life-changing money!",
+    "Did the banker even do the math?",
     "The banker is clearly hoping you'll panic!",
-    "Who is the banker anyway??!",
+    "Who is this banker anyway??!",
     "That offer is weaker than my morning coffee!"
   ],
   fair: [
