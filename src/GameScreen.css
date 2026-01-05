@@ -79,7 +79,7 @@
 }
 
 .scoreboard-item {
-  background: linear-gradient(180deg, #c9a961 0%, #a67c00 50%, #8b6914 100%);
+  background: linear-gradient(120deg, #FFF697 0%, #b3994d 50%, #B78F37 100%);
   color: #2a1810;
   padding: 4px 8px;
   border-radius: 3px;
@@ -95,15 +95,22 @@
 
 .peso-symbol {
   margin-right: auto;
+  text-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.4),
+    0 -1px 0 rgba(0, 0, 0, 0.6);
 }
 
 .amount-value {
   margin-left: auto;
+  text-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.4),
+    0 -1px 0 rgba(0, 0, 0, 0.6);
 }
 
 .player-case-display {
   margin-top: 10px;
   padding: 30px;
+  margin: 0 10px 5px 0;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   border: 2px solid #d4af37;
   border-radius: 8px;

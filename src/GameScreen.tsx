@@ -63,6 +63,54 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
     setOpenedAmounts([])
   }
 
+  const playSoundEffect = (openedAmount: number) => {
+    const unopenedCases = briefcases.filter(b => !b.isOpened && b.amount !== null && !b.isPlayerCase)
+    const unopenedAmounts = unopenedCases.map(b => b.amount as number).sort((a, b) => a - b)
+    
+    const minValue = Math.min(...unopenedAmounts)
+    const maxValue = Math.max(...unopenedAmounts)
+    
+    let soundFile = ''
+    
+    if (openedAmount === minValue) {
+      soundFile = '/cheer/cheer05.wav'
+    } else if (openedAmount === maxValue) {
+      soundFile = '/aww/aww03.mp3'
+    } else {
+      const sortedAmounts = [...unopenedAmounts].sort((a, b) => a - b)
+      const middleIndex = Math.floor(sortedAmounts.length / 2)
+      const median = sortedAmounts.length % 2 === 0
+        ? (sortedAmounts[middleIndex - 1] + sortedAmounts[middleIndex]) / 2
+        : sortedAmounts[middleIndex]
+      
+      const position = sortedAmounts.indexOf(openedAmount)
+      const percentile = position / sortedAmounts.length
+      
+      if (openedAmount < median) {
+        if (percentile <= 0.1) {
+          soundFile = '/cheer/cheer04.wav'
+        } else if (percentile <= 0.3) {
+          soundFile = '/cheer/cheer03.wav'
+        } else if (percentile <= 0.5) {
+          soundFile = '/cheer/cheer02.mp3'
+        } else {
+          soundFile = '/cheer/cheer01.mp3'
+        }
+      } else {
+        if (percentile >= 0.5) {
+          soundFile = '/aww/aww02.mp3'
+        } else {
+          soundFile = '/aww/aww01.mp3'
+        }
+      }
+    }
+    
+    if (soundFile) {
+      const audio = new Audio(soundFile)
+      audio.play().catch(err => console.log('Could not play sound:', err))
+    }
+  }
+
   const handleCaseClick = (caseId: number) => {
     const clickedCase = briefcases.find(c => c.id === caseId)
     if (!clickedCase || clickedCase.amount === null) return
@@ -74,6 +122,8 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
       setGamePhase('OPEN_CASES')
     } else if (gamePhase === 'OPEN_CASES') {
       if (clickedCase.isPlayerCase || clickedCase.isOpened) return
+
+      playSoundEffect(clickedCase.amount)
 
       setBriefcases(briefcases.map(c => 
         c.id === caseId ? { ...c, isOpened: true } : c
