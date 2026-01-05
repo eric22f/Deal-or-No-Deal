@@ -263,6 +263,10 @@
 
 .briefcase.clickable {
   cursor: pointer;
+}
+
+.briefcase.clickable-pulse {
+  cursor: pointer;
   animation: highlight-pulse 2s ease-in-out infinite;
 }
 
@@ -524,10 +528,25 @@
 }
 
 .banker-offer-container {
-  flex: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 10;
+  animation: slideInFromTop 2.5s ease-out;
+}
+
+@keyframes slideInFromTop {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 
 .banker-offer {
@@ -596,4 +615,29 @@
 .no-deal-button:active {
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.briefcase-grid-container {
+  opacity: 1;
+  transition: opacity 1.2s ease-out;
+  position: relative;
+}
+
+.briefcase-grid-container.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.banker-remark-fade-in {
+  opacity: 0;
+  animation: fadeInRemark 1.2s ease-in 2.5s forwards;
+}
+
+@keyframes fadeInRemark {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }

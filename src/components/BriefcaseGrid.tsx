@@ -27,10 +27,12 @@ export function BriefcaseGrid({
            (gamePhase === 'OPEN_CASES' && !briefcase.isPlayerCase && !briefcase.isOpened) ||
            (gamePhase === 'FINAL_CHOICE' && !briefcase.isPlayerCase && !briefcase.isOpened))
         
+        const shouldPulse = gamePhase === 'FINAL_CHOICE' && !briefcase.isPlayerCase && !briefcase.isOpened
+        
         return (
           <div
             key={briefcase.id}
-            className={`briefcase ${briefcase.isPlayerCase ? 'player-case' : ''} ${briefcase.isOpened ? 'opened' : ''} ${shouldRemove ? 'removed' : ''} ${isClickable ? 'clickable' : ''}`}
+            className={`briefcase ${briefcase.isPlayerCase ? 'player-case' : ''} ${briefcase.isOpened ? 'opened' : ''} ${shouldRemove ? 'removed' : ''} ${isClickable && !shouldPulse ? 'clickable' : ''} ${shouldPulse ? 'clickable-pulse' : ''}`}
             onClick={() => {
               if (gamePhase === 'FINAL_CHOICE' && !briefcase.isPlayerCase && !briefcase.isOpened) {
                 onFinalChoice(false)

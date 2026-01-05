@@ -29,7 +29,7 @@ export function PlayerBriefcase({
         className="player-case-display"
         onClick={onRevealBriefcase}
       >
-        <div className="player-case-label">Your Briefcase</div>
+        <div className="player-case-label">Reveal Contents</div>
         <div className="player-case-container">
           <img 
             src={`/briefcases/briefcase${String(briefcase.id).padStart(2, '0')}.png`}

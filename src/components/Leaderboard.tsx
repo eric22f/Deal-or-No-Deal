@@ -3,10 +3,10 @@ import type { PlayerScore } from '../types/game'
 
 interface LeaderboardProps {
   playerScores: PlayerScore[]
-  onNext: () => void
+  currentPlayerName?: string
 }
 
-export function Leaderboard({ playerScores, onNext }: LeaderboardProps): ReactElement {
+export function Leaderboard({ playerScores, currentPlayerName }: LeaderboardProps): ReactElement {
   const sortedScores = [...playerScores].sort((a, b) => b.winnings - a.winnings)
   
   // Split into 3 columns
@@ -19,13 +19,17 @@ export function Leaderboard({ playerScores, onNext }: LeaderboardProps): ReactEl
 
   return (
     <div className="leaderboard">
+      <div className="leaderboard-title">Leader Board</div>
       <div className="leaderboard-list">
         {columns.map((column, colIndex) => (
           <div key={colIndex} className="leaderboard-column">
             {column.map((player, index) => {
               const rank = colIndex * itemsPerColumn + index + 1
               return (
-                <div key={rank} className="leaderboard-item">
+                <div 
+                  key={rank} 
+                  className={`leaderboard-item ${player.name === currentPlayerName ? 'current-player' : ''}`}
+                >
                   <span className="leaderboard-rank">{rank}.</span>
                   <span className="leaderboard-name">{player.name}</span>
                   <span className="leaderboard-winnings">
@@ -37,9 +41,6 @@ export function Leaderboard({ playerScores, onNext }: LeaderboardProps): ReactEl
           </div>
         ))}
       </div>
-      <button className="next-button" onClick={onNext}>
-        Next
-      </button>
     </div>
   )
 }
