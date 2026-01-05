@@ -35,7 +35,8 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
   const [briefcaseRevealed, setBriefcaseRevealed] = useState<boolean>(false)
   const [bankerOffer, setBankerOffer] = useState<number>(0)
   const [bankerRemark, setBankerRemark] = useState<string>('')
-  const [phoneAudio, setPhoneAudio] = useState<HTMLAudioElement | null>(null)
+  const [thinkingAudio, setThinkingAudio] = useState<HTMLAudioElement | null>(null)
+  const [phoneIntervalId, setPhoneIntervalId] = useState<number | null>(null)
 
   useEffect(() => {
     initializeGame()
@@ -138,6 +139,13 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
       if (newCasesOpened >= CASES_TO_OPEN_PER_ROUND[currentRound]) {
         setGamePhase('BANKER_THINKING')
         
+        const thinkingSounds = ['thinking01.mp3', 'thinking02.mp3', 'thinking03.mp3']
+        const randomSound = thinkingSounds[Math.floor(Math.random() * thinkingSounds.length)]
+        const thinkAudio = new Audio(`/thinking/${randomSound}`)
+        thinkAudio.loop = true
+        thinkAudio.play().catch(err => console.log('Could not play thinking sound:', err))
+        setThinkingAudio(thinkAudio)
+        
         let minDelay, maxDelay
         if (currentRound === 0) {
           minDelay = 20000
@@ -156,11 +164,21 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
         const delay = Math.random() * (maxDelay - minDelay) + minDelay
         
         setTimeout(() => {
+          if (thinkAudio) {
+            thinkAudio.pause()
+            thinkAudio.currentTime = 0
+          }
+          
           setGamePhase('BANKER_CALLING')
-          const audio = new Audio('/banker-phone.mp3')
-          audio.loop = true
-          audio.play().catch(err => console.log('Could not play phone sound:', err))
-          setPhoneAudio(audio)
+          
+          const playPhoneRing = () => {
+            const audio = new Audio('/banker-phone.mp3')
+            audio.play().catch(err => console.log('Could not play phone sound:', err))
+          }
+          
+          playPhoneRing()
+          const intervalId = window.setInterval(playPhoneRing, 1000)
+          setPhoneIntervalId(intervalId)
         }, delay)
       }
     }
@@ -229,10 +247,15 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
   }
 
   const handleAnswerCall = () => {
-    if (phoneAudio) {
-      phoneAudio.pause()
-      phoneAudio.currentTime = 0
-      setPhoneAudio(null)
+    if (phoneIntervalId !== null) {
+      clearInterval(phoneIntervalId)
+      setPhoneIntervalId(null)
+    }
+    
+    if (thinkingAudio) {
+      thinkingAudio.pause()
+      thinkingAudio.currentTime = 0
+      setThinkingAudio(null)
     }
     
     const offer = calculateBankerOffer()
@@ -423,9 +446,11 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
       </div>
 
       <div className="right-panel">
-        <div className="game-message">
-          {getMessage()}
-        </div>
+        {gamePhase !== 'BANKER_THINKING' && gamePhase !== 'BANKER_CALLING' && (
+          <div className="game-message">
+            {getMessage()}
+          </div>
+        )}
 
         {gamePhase === 'GAME_OVER' ? (
           <div className="game-over-container">
