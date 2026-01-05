@@ -353,18 +353,20 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
     
     let soundFile = ''
     if (chosenAmount !== null && chosenAmount < 50) {
-      soundFile = '/laugh/laugh01.mp3'
+      soundFile = '/laugh01.mp3'
     } else if (chosenAmount !== null && otherAmount !== null) {
       if (chosenAmount > otherAmount) {
-        soundFile = '/cheer/cheer05.mp3'
+        soundFile = '/cheer/cheer05.wav'
       } else {
         soundFile = '/aww/aww03.mp3'
       }
     }
     
     if (soundFile) {
-      const audio = new Audio(soundFile)
-      audio.play().catch(err => console.log('Could not play sound:', err))
+      setTimeout(() => {
+        const audio = new Audio(soundFile)
+        audio.play().catch(err => console.log('Could not play sound:', err))
+      }, 100)
     }
     
     onGameEnd(chosenAmount || 0)
@@ -447,7 +449,7 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
 
         {briefcases.find(b => b.isPlayerCase) && gamePhase !== 'GAME_OVER' && (
           <div 
-            className={`player-case-display ${gamePhase === 'FINAL_CHOICE' ? 'clickable' : ''}`}
+            className="player-case-display"
             onClick={() => gamePhase === 'FINAL_CHOICE' && handleFinalChoice(true)}
           >
             <div className="player-case-label">Your Briefcase</div>
@@ -455,7 +457,7 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
               <img 
                 src={`/briefcases/briefcase${String(briefcases.find(b => b.isPlayerCase)?.id).padStart(2, '0')}.png`}
                 alt="Your Case"
-                className="player-case-image"
+                className={`player-case-image ${gamePhase === 'FINAL_CHOICE' ? 'clickable-pulse' : ''}`}
               />
             </div>
           </div>
@@ -496,7 +498,7 @@ function GameScreen({ playerName, onReset, onGameEnd, playerScores }: GameScreen
       </div>
 
       <div className="right-panel">
-        {gamePhase !== 'BANKER_THINKING' && gamePhase !== 'BANKER_CALLING' && (
+        {gamePhase !== 'BANKER_THINKING' && gamePhase !== 'BANKER_CALLING' && gamePhase !== 'FINAL_CHOICE' && (
           <div className="game-message">
             {getMessage()}
           </div>

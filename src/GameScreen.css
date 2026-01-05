@@ -297,14 +297,9 @@
   }
 }
 
-.player-case-display.clickable {
+.player-case-image.clickable-pulse {
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.player-case-display.clickable:hover {
-  transform: scale(1.02);
-  box-shadow: 0 6px 12px rgba(212, 175, 55, 0.5);
+  animation: highlight-pulse 2s ease-in-out infinite;
 }
 
 .briefcase {
