@@ -188,7 +188,7 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
     
     setTimeout(() => {
       setButtonsDisabled(false)
-    }, 3300)
+    }, 3500)
     
     setTimeout(() => {
       const randomDealOrNo = Math.floor(Math.random() * 3) + 1
