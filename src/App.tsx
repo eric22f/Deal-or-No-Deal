@@ -86,6 +86,15 @@ function App() {
   }
 
   const handleReset = async () => {
+    // Stop all game audio before returning to home screen
+    const allAudio = document.querySelectorAll('audio')
+    allAudio.forEach(audio => {
+      if (audio !== audioRef.current) {
+        audio.pause()
+        audio.currentTime = 0
+      }
+    })
+    
     setIsGameActive(false)
     setCurrentPlayer('')
     setPlayerName('')

@@ -63,6 +63,14 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
       offerAudioRef.current = finalChoiceAudio
       finalChoiceAudio.play().catch(err => console.log('Could not play final choice audio:', err))
     }
+    
+    // Cleanup function to stop looping audio when component unmounts
+    return () => {
+      if (offerAudioRef.current) {
+        offerAudioRef.current.pause()
+        offerAudioRef.current = null
+      }
+    }
   }, [state.gamePhase])
 
   const handleNameClick = () => {
