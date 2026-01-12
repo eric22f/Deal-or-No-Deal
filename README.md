@@ -18,7 +18,7 @@ A web-based implementation of the popular game show "Deal or No Deal" built with
 
 ## Game Features
 
-- 22 briefcases with values ranging from ₱0.01 to ₱2,000
+- 22 briefcases with values ranging from ₱0.05 to ₱2,000
 - Dynamic banker offers based on remaining case values
 - Sound effects and music from the show
 - Leaderboard tracking for multiple players
