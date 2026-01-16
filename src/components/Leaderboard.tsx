@@ -7,6 +7,14 @@ interface LeaderboardProps {
   currentPlayerName?: string
 }
 
+const getTierClass = (winnings: number): string => {
+  if (winnings >= 4000) return 'tier-jackpot'
+  if (winnings >= 3000) return 'tier-high'
+  if (winnings >= 2000) return 'tier-medium'
+  if (winnings >= 1000) return 'tier-low'
+  return ''
+}
+
 export function Leaderboard({ playerScores, currentPlayerName }: LeaderboardProps): ReactElement {
   const sortedScores = [...playerScores].sort((a, b) => b.winnings - a.winnings)
   
@@ -26,13 +34,16 @@ export function Leaderboard({ playerScores, currentPlayerName }: LeaderboardProp
           <div key={colIndex} className="leaderboard-column">
             {column.map((player, index) => {
               const rank = colIndex * itemsPerColumn + index + 1
+              const tierClass = getTierClass(player.winnings)
               return (
                 <div 
                   key={rank} 
-                  className={`leaderboard-item ${player.name === currentPlayerName ? 'current-player' : ''}`}
+                  className={`leaderboard-item ${tierClass} ${player.name === currentPlayerName ? 'current-player' : ''}`}
                 >
                   <span className="leaderboard-rank">{rank}.</span>
-                  <span className="leaderboard-name">{player.name}</span>
+                  <span className="leaderboard-name">
+                    {player.name}
+                  </span>
                   <span className="leaderboard-winnings">
                     ₱{player.winnings.toLocaleString('en-PH')}
                   </span>

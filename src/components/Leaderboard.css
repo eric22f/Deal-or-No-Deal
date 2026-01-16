@@ -54,7 +54,37 @@
 
 .leaderboard-name {
   flex: 1;
-  margin-left: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Tier-based gradient backgrounds - magenta shades */
+.leaderboard-item.tier-jackpot {
+  background: linear-gradient(135deg, #ff00ff 0%, #ff66ff 50%, #ff00ff 100%);
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
+  border: 2px solid #ff00ff;
+}
+
+.leaderboard-item.tier-high {
+  background: linear-gradient(135deg, #cc00cc 0%, #e600e6 50%, #cc00cc 100%);
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(204, 0, 204, 0.6);
+}
+
+.leaderboard-item.tier-medium {
+  background: linear-gradient(135deg, #990099 0%, #b300b3 50%, #990099 100%);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(153, 0, 153, 0.4);
+}
+
+.leaderboard-item.tier-low {
+  background: linear-gradient(135deg, #660066 0%, #800080 50%, #660066 100%);
+  color: #fff;
+  box-shadow: 0 0 8px rgba(102, 0, 102, 0.3);
 }
 
 .leaderboard-winnings {

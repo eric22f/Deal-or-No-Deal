@@ -186,13 +186,25 @@ function App() {
                 {[...playerScores]
                   .sort((a, b) => b.winnings - a.winnings)
                   .slice(0, showFullLeaderboard ? playerScores.length : 3)
-                  .map((player, index) => (
-                    <div key={index} className="home-leaderboard-item">
-                      <span className="home-leaderboard-rank">{index + 1}.</span>
-                      <span className="home-leaderboard-name">{player.name}</span>
-                      <span className="home-leaderboard-winnings">₱{player.winnings.toLocaleString('en-PH')}</span>
-                    </div>
-                  ))}
+                  .map((player, index) => {
+                    const getTierClass = (winnings: number): string => {
+                      if (winnings >= 4000) return 'home-tier-jackpot'
+                      if (winnings >= 3000) return 'home-tier-high'
+                      if (winnings >= 2000) return 'home-tier-medium'
+                      if (winnings >= 1000) return 'home-tier-low'
+                      return ''
+                    }
+                    const tierClass = getTierClass(player.winnings)
+                    return (
+                      <div key={index} className={`home-leaderboard-item ${tierClass}`}>
+                        <span className="home-leaderboard-rank">{index + 1}.</span>
+                        <span className="home-leaderboard-name">
+                          {player.name}
+                        </span>
+                        <span className="home-leaderboard-winnings">₱{player.winnings.toLocaleString('en-PH')}</span>
+                      </div>
+                    )
+                  })}
               </div>
               {playerScores.length > 3 && (
                 <button 
