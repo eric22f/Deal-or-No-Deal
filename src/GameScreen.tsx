@@ -262,7 +262,7 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
       setSpinningBriefcaseId(lastCase.id)
       
       // Play cartoon spin sound effect
-      const spinSound = new Audio('/cartoon_spin.mp3')
+      const spinSound = new Audio('/cartoon-spin.mp3')
       spinSound.play().catch(err => console.log('Could not play spin sound:', err))
       
       setTimeout(() => {
