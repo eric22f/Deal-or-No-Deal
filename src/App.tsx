@@ -10,11 +10,38 @@ interface PlayerScore {
 function App() {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playerName, setPlayerName] = useState('')
-  const [playerScores, setPlayerScores] = useState<PlayerScore[]>([])
+  const [playerScores, setPlayerScores] = useState<PlayerScore[]>(() => {
+    // Load leaderboard from cookies on initial mount
+    const savedScores = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('dealOrNoDealLeaderboard='))
+    
+    if (savedScores) {
+      try {
+        const decoded = decodeURIComponent(savedScores.split('=')[1])
+        return JSON.parse(decoded)
+      } catch (error) {
+        console.log('Could not parse saved leaderboard:', error)
+        return []
+      }
+    }
+    return []
+  })
   const [nameError, setNameError] = useState('')
   const [isGameActive, setIsGameActive] = useState(false)
   const [currentPlayer, setCurrentPlayer] = useState('')
   const [showFullLeaderboard, setShowFullLeaderboard] = useState(false)
+
+  // Save leaderboard to cookies whenever it changes
+  useEffect(() => {
+    if (playerScores.length > 0) {
+      const encoded = encodeURIComponent(JSON.stringify(playerScores))
+      // Set cookie to expire in 1 year
+      const expiryDate = new Date()
+      expiryDate.setFullYear(expiryDate.getFullYear() + 1)
+      document.cookie = `dealOrNoDealLeaderboard=${encoded}; expires=${expiryDate.toUTCString()}; path=/; SameSite=Strict`
+    }
+  }, [playerScores])
 
   useEffect(() => {
     const playAudio = async () => {

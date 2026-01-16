@@ -390,6 +390,13 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
             <div className="game-message banker-remark-fade-in">{message}</div>
             <div className="banker-offer-container">
               <div className="banker-offer">
+                {state.previousBankerOffer > 0 && (
+                  <div className="previous-offer">
+                    Previous Offer: ₱ {state.previousBankerOffer.toLocaleString('en-PH')}
+                    {state.bankerOffer > state.previousBankerOffer && <span className="offer-arrow-up"> ▲</span>}
+                    {state.bankerOffer < state.previousBankerOffer && <span className="offer-arrow-down"> ▼</span>}
+                  </div>
+                )}
                 <div className="offer-title">Banker's Offer</div>
                 <div className="offer-amount">₱ {state.bankerOffer.toLocaleString('en-PH')}</div>
                 <div className="offer-buttons">

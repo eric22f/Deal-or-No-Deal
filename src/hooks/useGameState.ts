@@ -13,6 +13,7 @@ export interface GameState {
   tookDeal: boolean
   briefcaseRevealed: boolean
   bankerOffer: number
+  previousBankerOffer: number
   bankerRemark: string
 }
 
@@ -61,6 +62,7 @@ const initialState: GameState = {
   tookDeal: false,
   briefcaseRevealed: false,
   bankerOffer: 0,
+  previousBankerOffer: 0,
   bankerRemark: ''
 }
 
@@ -106,6 +108,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     case 'SET_BANKER_OFFER':
       return {
         ...state,
+        previousBankerOffer: state.bankerOffer,
         bankerOffer: action.offer,
         bankerRemark: action.remark,
         gamePhase: 'BANKER_OFFER'
