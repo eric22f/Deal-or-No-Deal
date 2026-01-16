@@ -139,6 +139,12 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
     if (!clickedCase || clickedCase.amount === null) return
 
     if (state.gamePhase === 'SELECT_YOUR_CASE') {
+      // Play random case selection sound
+      const randomCaseNum = Math.floor(Math.random() * 4) + 1
+      const extension = randomCaseNum <= 2 ? 'mp3' : 'wav'
+      const caseSound = new Audio(`/case/case0${randomCaseNum}.${extension}`)
+      caseSound.play().catch(err => console.log('Could not play case sound:', err))
+      
       dispatch({ type: 'SELECT_PLAYER_CASE', caseId })
     } else if (state.gamePhase === 'OPEN_CASES') {
       if (clickedCase.isPlayerCase || clickedCase.isOpened) return
@@ -254,6 +260,10 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
     // If swapping, trigger spinning animation for 2 seconds
     if (!choosePlayerCase) {
       setSpinningBriefcaseId(lastCase.id)
+      
+      // Play cartoon spin sound effect
+      const spinSound = new Audio('/cartoon_spin.mp3')
+      spinSound.play().catch(err => console.log('Could not play spin sound:', err))
       
       setTimeout(() => {
         setSpinningBriefcaseId(null)
