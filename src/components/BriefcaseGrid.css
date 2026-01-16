@@ -126,3 +126,20 @@
   opacity: 0;
   pointer-events: none;
 }
+
+.briefcase.spinning {
+  animation: spin-briefcase 2s linear;
+  pointer-events: none;
+}
+
+@keyframes spin-briefcase {
+  0% {
+    transform: rotateY(0deg) scale(1);
+  }
+  50% {
+    transform: rotateY(1800deg) scale(1.2);
+  }
+  100% {
+    transform: rotateY(3600deg) scale(1);
+  }
+}

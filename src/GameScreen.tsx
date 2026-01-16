@@ -43,6 +43,7 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
   const [editedName, setEditedName] = useState(playerName)
   const [nameError, setNameError] = useState('')
   const [buttonsDisabled, setButtonsDisabled] = useState(false)
+  const [spinningBriefcaseId, setSpinningBriefcaseId] = useState<number | null>(null)
   const nameInputRef = useRef<HTMLInputElement>(null)
   const offerAudioRef = useRef<HTMLAudioElement | null>(null)
 
@@ -250,29 +251,63 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
     
     if (!playerCase || !lastCase) return
     
-    const chosenAmount = choosePlayerCase ? playerCase.amount : lastCase.amount
-    const otherAmount = choosePlayerCase ? lastCase.amount : playerCase.amount
-    
-    let soundFile = ''
-    if (chosenAmount !== null && chosenAmount <= 50) {
-      soundFile = '/laugh01.mp3'
-    } else if (chosenAmount !== null && otherAmount !== null) {
-      if (chosenAmount > otherAmount) {
-        soundFile = '/cheer/cheer05.wav'
-      } else {
-        soundFile = '/aww/aww03.mp3'
-      }
-    }
-    
-    if (soundFile) {
+    // If swapping, trigger spinning animation for 2 seconds
+    if (!choosePlayerCase) {
+      setSpinningBriefcaseId(lastCase.id)
+      
       setTimeout(() => {
-        const audio = new Audio(soundFile)
-        audio.play().catch(err => console.log('Could not play sound:', err))
-      }, 100)
+        setSpinningBriefcaseId(null)
+        
+        const chosenAmount = lastCase.amount
+        const otherAmount = playerCase.amount
+        
+        let soundFile = ''
+        if (chosenAmount !== null && chosenAmount <= 50) {
+          soundFile = '/laugh01.mp3'
+        } else if (chosenAmount !== null && otherAmount !== null) {
+          if (chosenAmount > otherAmount) {
+            soundFile = '/cheer/cheer05.wav'
+          } else {
+            soundFile = '/aww/aww03.mp3'
+          }
+        }
+        
+        if (soundFile) {
+          setTimeout(() => {
+            const audio = new Audio(soundFile)
+            audio.play().catch(err => console.log('Could not play sound:', err))
+          }, 100)
+        }
+        
+        dispatch({ type: 'FINAL_CHOICE', winnings: chosenAmount || 0 })
+        onGameEnd(chosenAmount || 0)
+      }, 2000)
+    } else {
+      // Keeping own case - no animation needed
+      const chosenAmount = playerCase.amount
+      const otherAmount = lastCase.amount
+      
+      let soundFile = ''
+      if (chosenAmount !== null && chosenAmount <= 50) {
+        soundFile = '/laugh01.mp3'
+      } else if (chosenAmount !== null && otherAmount !== null) {
+        if (chosenAmount > otherAmount) {
+          soundFile = '/cheer/cheer05.wav'
+        } else {
+          soundFile = '/aww/aww03.mp3'
+        }
+      }
+      
+      if (soundFile) {
+        setTimeout(() => {
+          const audio = new Audio(soundFile)
+          audio.play().catch(err => console.log('Could not play sound:', err))
+        }, 100)
+      }
+      
+      dispatch({ type: 'FINAL_CHOICE', winnings: chosenAmount || 0 })
+      onGameEnd(chosenAmount || 0)
     }
-    
-    dispatch({ type: 'FINAL_CHOICE', winnings: chosenAmount || 0 })
-    onGameEnd(chosenAmount || 0)
   }
 
   const handleRevealBriefcase = () => {
@@ -440,6 +475,7 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
               casesToRemove={state.casesToRemove}
               onCaseClick={handleCaseClick}
               onFinalChoice={handleFinalChoice}
+              spinningBriefcaseId={spinningBriefcaseId}
             />
           </div>
         )}

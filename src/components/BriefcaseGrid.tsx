@@ -9,6 +9,7 @@ interface BriefcaseGridProps {
   casesToRemove: number[]
   onCaseClick: (caseId: number) => void
   onFinalChoice: (choosePlayerCase: boolean) => void
+  spinningBriefcaseId?: number | null
 }
 
 export function BriefcaseGrid({
@@ -16,7 +17,8 @@ export function BriefcaseGrid({
   gamePhase,
   casesToRemove,
   onCaseClick,
-  onFinalChoice
+  onFinalChoice,
+  spinningBriefcaseId
 }: BriefcaseGridProps): ReactElement {
   return (
     <div className="briefcases-grid">
@@ -30,11 +32,12 @@ export function BriefcaseGrid({
            (gamePhase === 'FINAL_CHOICE' && !briefcase.isPlayerCase && !briefcase.isOpened))
         
         const shouldPulse = gamePhase === 'FINAL_CHOICE' && !briefcase.isPlayerCase && !briefcase.isOpened
+        const isSpinning = spinningBriefcaseId === briefcase.id
         
         return (
           <div
             key={briefcase.id}
-            className={`briefcase ${briefcase.isPlayerCase ? 'player-case' : ''} ${briefcase.isOpened ? 'opened' : ''} ${shouldRemove ? 'removed' : ''} ${isClickable && !shouldPulse ? 'clickable' : ''} ${shouldPulse ? 'clickable-pulse' : ''}`}
+            className={`briefcase ${briefcase.isPlayerCase ? 'player-case' : ''} ${briefcase.isOpened ? 'opened' : ''} ${shouldRemove ? 'removed' : ''} ${isClickable && !shouldPulse ? 'clickable' : ''} ${shouldPulse ? 'clickable-pulse' : ''} ${isSpinning ? 'spinning' : ''}`}
             onClick={() => {
               if (gamePhase === 'FINAL_CHOICE' && !briefcase.isPlayerCase && !briefcase.isOpened) {
                 onFinalChoice(false)
