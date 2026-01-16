@@ -192,6 +192,7 @@ function App() {
                       if (winnings >= 3000) return 'home-tier-high'
                       if (winnings >= 2000) return 'home-tier-medium'
                       if (winnings >= 1000) return 'home-tier-low'
+                      if (winnings >= 500) return 'home-tier-minimal'
                       return ''
                     }
                     const tierClass = getTierClass(player.winnings)

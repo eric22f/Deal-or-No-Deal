@@ -12,6 +12,7 @@ const getTierClass = (winnings: number): string => {
   if (winnings >= 3000) return 'tier-high'
   if (winnings >= 2000) return 'tier-medium'
   if (winnings >= 1000) return 'tier-low'
+  if (winnings >= 500) return 'tier-minimal'
   return ''
 }
 

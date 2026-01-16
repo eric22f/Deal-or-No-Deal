@@ -221,6 +221,17 @@
   color: #fff;
 }
 
+.home-leaderboard-item.home-tier-minimal {
+  background: linear-gradient(135deg, #e6b3e6 0%, #f0c4f0 50%, #e6b3e6 100%);
+  box-shadow: 0 0 5px rgba(230, 179, 230, 0.2);
+}
+
+.home-leaderboard-item.home-tier-minimal .home-leaderboard-rank,
+.home-leaderboard-item.home-tier-minimal .home-leaderboard-name,
+.home-leaderboard-item.home-tier-minimal .home-leaderboard-winnings {
+  color: #1a1a2e;
+}
+
 .home-leaderboard-winnings {
   color: #d4af37;
   font-weight: bold;

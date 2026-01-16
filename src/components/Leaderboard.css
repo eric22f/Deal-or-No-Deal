@@ -87,6 +87,12 @@
   box-shadow: 0 0 8px rgba(102, 0, 102, 0.3);
 }
 
+.leaderboard-item.tier-minimal {
+  background: linear-gradient(135deg, #e6b3e6 0%, #f0c4f0 50%, #e6b3e6 100%);
+  color: #1a1a2e;
+  box-shadow: 0 0 5px rgba(230, 179, 230, 0.2);
+}
+
 .leaderboard-winnings {
   font-weight: bold;
   margin-left: auto;
