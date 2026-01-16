@@ -31,6 +31,7 @@ function App() {
   const [isGameActive, setIsGameActive] = useState(false)
   const [currentPlayer, setCurrentPlayer] = useState('')
   const [showFullLeaderboard, setShowFullLeaderboard] = useState(false)
+  const [kidsMode, setKidsMode] = useState(false)
 
   // Save leaderboard to cookies whenever it changes
   useEffect(() => {
@@ -112,6 +113,10 @@ function App() {
     setCurrentPlayer(newName)
   }
 
+  const handleKidsModeToggle = () => {
+    setKidsMode(!kidsMode)
+  }
+
   const handleReset = async () => {
     // Stop all game audio before returning to home screen
     const allAudio = document.querySelectorAll('audio')
@@ -125,6 +130,7 @@ function App() {
     setIsGameActive(false)
     setCurrentPlayer('')
     setPlayerName('')
+    setKidsMode(false)
     
     if (audioRef.current) {
       audioRef.current.currentTime = 0
@@ -145,6 +151,7 @@ function App() {
           onGameEnd={handleGameEnd}
           onNameChange={handleNameChange}
           playerScores={playerScores}
+          kidsMode={kidsMode}
         />
       ) : (
         <div className="intro-screen">
@@ -179,6 +186,14 @@ function App() {
               Start New Game
             </button>
           </div>
+          <label className="home-kids-mode-toggle">
+            <input
+              type="checkbox"
+              checked={kidsMode}
+              onChange={handleKidsModeToggle}
+            />
+            <span className="toggle-label">KIDS MODE</span>
+          </label>
           {playerScores.length > 0 && (
             <div className="home-leaderboard">
               <h3 className="home-leaderboard-title">Leaderboard</h3>

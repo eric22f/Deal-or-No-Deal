@@ -1,6 +1,6 @@
 import { useReducer, type Dispatch } from 'react'
 import type { GamePhase, Briefcase } from '../types/game'
-import { ALL_VALUES } from '../constants/gameConfig'
+import { ALL_VALUES, ALL_VALUES_CHILDREN } from '../constants/gameConfig'
 
 export interface GameState {
   briefcases: Briefcase[]
@@ -18,7 +18,7 @@ export interface GameState {
 }
 
 type GameAction =
-  | { type: 'INITIALIZE_GAME' }
+  | { type: 'INITIALIZE_GAME'; kidsMode?: boolean }
   | { type: 'SELECT_PLAYER_CASE'; caseId: number }
   | { type: 'OPEN_CASE'; caseId: number; amount: number }
   | { type: 'START_BANKER_THINKING' }
@@ -31,8 +31,9 @@ type GameAction =
   | { type: 'FINAL_CHOICE'; winnings: number }
   | { type: 'REVEAL_BRIEFCASE' }
 
-const initializeBriefcases = (): Briefcase[] => {
-  const shuffledAmounts = [...ALL_VALUES].sort(() => Math.random() - 0.5)
+const initializeBriefcases = (kidsMode: boolean = false): Briefcase[] => {
+  const values = kidsMode ? ALL_VALUES_CHILDREN : ALL_VALUES
+  const shuffledAmounts = [...values].sort(() => Math.random() - 0.5)
   const cases: Briefcase[] = []
   
   for (let i = 1; i <= 24; i++) {
@@ -71,7 +72,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     case 'INITIALIZE_GAME':
       return {
         ...initialState,
-        briefcases: initializeBriefcases()
+        briefcases: initializeBriefcases(action.kidsMode)
       }
     
     case 'SELECT_PLAYER_CASE':

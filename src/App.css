@@ -59,6 +59,38 @@
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5), 0 0 0 2px #fff;
 }
 
+.home-kids-mode-toggle {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 18px;
+  color: #d4af37;
+  user-select: none;
+  font-weight: bold;
+  background: rgba(26, 26, 46, 0.8);
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 2px solid #d4af37;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  opacity: 0.5;
+}
+
+.home-kids-mode-toggle input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #d4af37;
+}
+
+.home-kids-mode-toggle .toggle-label {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
 .start-button {
   padding: 15px 40px;
   font-size: 24px;

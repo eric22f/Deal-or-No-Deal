@@ -46,6 +46,41 @@
   background-color: rgba(212, 175, 55, 0.2);
 }
 
+.player-name-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.kids-mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #d4af37;
+  user-select: none;
+}
+
+.kids-mode-toggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #d4af37;
+}
+
+.kids-mode-toggle input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.toggle-label {
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
 .player-name-edit-container {
   display: flex;
   flex-direction: column;

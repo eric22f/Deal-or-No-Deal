@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import './GameScreen.css'
 import './styles/animations.css'
 import type { PlayerScore } from './types/game'
-import { LEFT_COLUMN_VALUES, RIGHT_COLUMN_VALUES, BANKER_THINKING_DELAYS } from './constants/gameConfig'
+import { LEFT_COLUMN_VALUES, RIGHT_COLUMN_VALUES, LEFT_COLUMN_VALUES_CHILDREN, RIGHT_COLUMN_VALUES_CHILDREN, BANKER_THINKING_DELAYS } from './constants/gameConfig'
 import { calculateBankerOffer, getBankerRemark } from './utils/bankerCalculations'
 import { playCaseOpenSound, playDealAcceptedSound, playBriefcaseRevealSound } from './utils/soundEffects'
 import { useGameState } from './hooks/useGameState'
@@ -33,9 +33,10 @@ interface GameScreenProps {
   onGameEnd: (winnings: number) => void
   onNameChange: (newName: string) => void
   playerScores: PlayerScore[]
+  kidsMode: boolean
 }
 
-function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores }: GameScreenProps) {
+function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores, kidsMode }: GameScreenProps) {
   const [state, dispatch] = useGameState()
   const audio = useAudioManager()
   const [isEditingName, setIsEditingName] = useState(false)
@@ -46,8 +47,8 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
   const offerAudioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
-    dispatch({ type: 'INITIALIZE_GAME' })
-  }, [dispatch])
+    dispatch({ type: 'INITIALIZE_GAME', kidsMode })
+  }, [dispatch, kidsMode])
 
   useEffect(() => {
     if (isEditingName && nameInputRef.current) {
@@ -332,8 +333,8 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
         </div>
 
         <PrizeBoard
-          leftColumn={LEFT_COLUMN_VALUES}
-          rightColumn={RIGHT_COLUMN_VALUES}
+          leftColumn={kidsMode ? LEFT_COLUMN_VALUES_CHILDREN : LEFT_COLUMN_VALUES}
+          rightColumn={kidsMode ? RIGHT_COLUMN_VALUES_CHILDREN : RIGHT_COLUMN_VALUES}
           openedAmounts={state.openedAmounts}
         />
 
