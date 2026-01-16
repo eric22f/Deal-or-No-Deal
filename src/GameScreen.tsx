@@ -293,7 +293,11 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
         onGameEnd(chosenAmount || 0)
       }, 2000)
     } else {
-      // Keeping own case - no animation needed
+      // Keeping own case - play gasp sound and no animation
+      const randomGaspNum = Math.floor(Math.random() * 3) + 1
+      const gaspSound = new Audio(`/gasp/gasp0${randomGaspNum}.wav`)
+      gaspSound.play().catch(err => console.log('Could not play gasp sound:', err))
+      
       const chosenAmount = playerCase.amount
       const otherAmount = lastCase.amount
       
