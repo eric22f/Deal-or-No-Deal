@@ -460,3 +460,22 @@
   opacity: 0;
   animation: fadeInRemark 1.2s ease-in 2.5s forwards;
 }
+
+.banker-thinking-corner {
+  position: absolute;
+  bottom: 30%;
+  right: 20px;
+  transform: translateY(50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.banker-thinking-image {
+  width: auto;
+  height: auto;
+  max-width: 350px;
+  max-height: 320px;
+  object-fit: contain;
+  display: block;
+}

@@ -44,8 +44,21 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
   const [nameError, setNameError] = useState('')
   const [buttonsDisabled, setButtonsDisabled] = useState(false)
   const [spinningBriefcaseId, setSpinningBriefcaseId] = useState<number | null>(null)
+  const [bankerThinkingImage, setBankerThinkingImage] = useState(() => {
+    const randomNum = Math.floor(Math.random() * 5) + 1
+    return `/banker/banker-thinking0${randomNum}.png`
+  })
   const nameInputRef = useRef<HTMLInputElement>(null)
   const offerAudioRef = useRef<HTMLAudioElement | null>(null)
+
+  const getRandomBankerImage = () => {
+    let newImage
+    do {
+      const randomNum = Math.floor(Math.random() * 5) + 1
+      newImage = `/banker/banker-thinking0${randomNum}.png`
+    } while (newImage === bankerThinkingImage)
+    return newImage
+  }
 
   useEffect(() => {
     dispatch({ type: 'INITIALIZE_GAME', kidsMode })
@@ -149,6 +162,22 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
     } else if (state.gamePhase === 'OPEN_CASES') {
       if (clickedCase.isPlayerCase || clickedCase.isOpened) return
 
+      // Check if this is the largest or smallest remaining value BEFORE opening
+      // (including player's case, excluding the case about to be opened)
+      const remainingCases = state.briefcases.filter(b => 
+        !b.isOpened && b.amount !== null && b.id !== caseId
+      )
+      const remainingAmounts = remainingCases.map(b => b.amount as number)
+      const maxAmount = Math.max(...remainingAmounts)
+      const minAmount = Math.min(...remainingAmounts)
+      
+      // Only react if the clicked case is higher than max or lower than min
+      if (clickedCase.amount !== null && clickedCase.amount > maxAmount) {
+        setBankerThinkingImage('/banker/banker-happy.png')
+      } else if (clickedCase.amount !== null && clickedCase.amount < minAmount) {
+        setBankerThinkingImage('/banker/banker-sad.png')
+      }
+
       playCaseOpenSound(clickedCase.amount, state.briefcases)
       dispatch({ type: 'OPEN_CASE', caseId, amount: clickedCase.amount })
 
@@ -169,6 +198,21 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
 
         // Start banker sequence
         dispatch({ type: 'START_BANKER_THINKING' })
+        
+        // Check if the last case was truly the highest or lowest among ALL remaining (including player's)
+        // If it was just the highest/lowest among unopened non-player cases, switch to random thinking
+        const allRemainingAfterOpen = state.briefcases.filter(b => 
+          !b.isOpened && b.amount !== null && b.id !== caseId
+        )
+        const allRemainingAmounts = allRemainingAfterOpen.map(b => b.amount as number)
+        const trueMax = Math.max(...allRemainingAmounts)
+        const trueMin = Math.min(...allRemainingAmounts)
+        
+        const wasTrueExtreme = (clickedCase.amount !== null && clickedCase.amount > trueMax) ||
+                               (clickedCase.amount !== null && clickedCase.amount < trueMin)
+        if (!wasTrueExtreme) {
+          setBankerThinkingImage(getRandomBankerImage())
+        }
         
         const thinkAudio = audio.startThinkingSound()
         const delay = getThinkingDelay(state.currentRound, BANKER_THINKING_DELAYS)
@@ -233,6 +277,9 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
       dispatch({ type: 'ACCEPT_DEAL', bankerOffer: state.bankerOffer })
       onGameEnd(state.bankerOffer)
     } else {
+      // Pick a new random banker thinking image when No Deal is selected
+      setBankerThinkingImage(getRandomBankerImage())
+      
       const openedCaseIds = getOpenedCaseIds(state.briefcases)
       dispatch({ type: 'REJECT_DEAL', casesToRemove: openedCaseIds })
       
@@ -491,6 +538,13 @@ function GameScreen({ playerName, onReset, onGameEnd, onNameChange, playerScores
               onFinalChoice={handleFinalChoice}
               spinningBriefcaseId={spinningBriefcaseId}
             />
+            <div className="banker-thinking-corner">
+              <img 
+                src={state.gamePhase === 'BANKER_CALLING' || state.gamePhase === 'BANKER_OFFER' ? '/banker/banker-calling.png' : bankerThinkingImage}
+                alt="The Banker"
+                className="banker-thinking-image"
+              />
+            </div>
           </div>
         )}
       </div>
